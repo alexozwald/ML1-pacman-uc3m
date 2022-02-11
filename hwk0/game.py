@@ -618,6 +618,15 @@ class Game(object):
         agentIndex = self.startingIndex
         numAgents = len( self.agents )
         step = 0
+
+        # ADDED BY ALEX TO PRINT DATA
+        # check if file exists before writing header
+        ExistingFile = os.path.isfile("example.csv") 
+        if not ExistingFile:
+            with open("example.csv","a") as f:
+                f.write("x,y,score\n")
+
+
         while not self.gameOver:
             # Fetch the next agent
             agent = self.agents[agentIndex]
@@ -646,6 +655,14 @@ class Game(object):
                 self.unmute()
             else:
                 observation = self.state.deepCopy()
+
+
+            # IF AGENT IS PACMAN
+            if agentIndex == 0:
+                with open('example.csv','a') as f:
+                    f.write( f"{agent.printLineData(observation)}\n" )
+
+
             # Solicit an action
             action = None
             step += 1

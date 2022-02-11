@@ -263,10 +263,10 @@ class BasicAgentAA(BustersAgent):
         # Score
         print("Score: ", gameState.getScore())
         
-        
+
     def chooseAction(self, gameState):
         self.countActions = self.countActions + 1
-        self.printInfo(gameState)
+        #self.printInfo(gameState)
         move = Directions.STOP
         legal = gameState.getLegalActions(0) ##Legal position from the pacman
         move_random = random.randint(0, 3)
@@ -277,4 +277,6 @@ class BasicAgentAA(BustersAgent):
         return move
 
     def printLineData(self, gameState):
-        return "XXXXXXXXXX"
+        state = str(gameState.getPacmanPosition()[0]) + ',' + str(gameState.getPacmanPosition()[1]) + ',' + str(gameState.getScore())
+        print(state)
+        return state
