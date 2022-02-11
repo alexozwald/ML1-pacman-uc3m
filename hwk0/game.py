@@ -621,9 +621,9 @@ class Game(object):
 
         # ADDED BY ALEX TO PRINT DATA
         # check if file exists before writing header
-        ExistingFile = os.path.isfile("example.csv") 
+        ExistingFile = os.path.isfile("ex.csv") 
         if not ExistingFile:
-            with open("example.csv","a") as f:
+            with open("ex.csv","a") as f:
                 f.write("x,y,score\n")
 
 
