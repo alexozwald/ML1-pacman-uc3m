@@ -659,7 +659,7 @@ class Game(object):
 
             # IF AGENT IS PACMAN
             if agentIndex == 0:
-                with open('example.csv','a') as f:
+                with open('ex.csv','a') as f:
                     f.write( f"{agent.printLineData(observation)}\n" )
 
 
