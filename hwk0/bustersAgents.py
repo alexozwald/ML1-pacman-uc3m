@@ -15,12 +15,14 @@ from __future__ import print_function
 
 from builtins import range
 from builtins import object
+from os import DirEntry
 import util
 from game import Agent
 from game import Directions
 from keyboardAgents import KeyboardAgent
 import inference
 import busters
+from random import randint
 
 class NullGraphics(object):
     "Placeholder for graphics"
@@ -262,7 +264,7 @@ class BasicAgentAA(BustersAgent):
         print( gameState.getWalls())
         # Score
         print("Score: ", gameState.getScore())
-        
+
 
     def chooseAction(self, gameState):
         self.countActions = self.countActions + 1
@@ -275,11 +277,6 @@ class BasicAgentAA(BustersAgent):
         # find min from list (cant use min() if one ghost is already dead and it
         # becomes None-Type instead of a tuple).  also keep track of distances.
         closest_ghost = 100
-
-        print(f"is int..{type(man_dists[0])}, conditional..{type(man_dists[0]) == int}, dist..{man_dists[0]}")
-        print(f"is int..{type(man_dists[1])}, conditional..{type(man_dists[1]) == int}, dist..{man_dists[1]}")
-        print(f"is int..{type(man_dists[2])}, conditional..{type(man_dists[2]) == int}, dist..{man_dists[2]}")
-        print(f"is int..{type(man_dists[3])}, conditional..{type(man_dists[3]) == int}, dist..{man_dists[3]}")
 
         if ((type(man_dists[0]) == int) and (man_dists[0] < closest_ghost)):
             closest_ghost = man_dists[0]
@@ -298,19 +295,13 @@ class BasicAgentAA(BustersAgent):
             move = Directions.STOP
             return move
 
-        print(f"closest ghost by index is..{idx_gho}\tdist is..{closest_ghost}")
-
         # get locations of pacman + closest ghost
-        loc_pac = gameState.getPacmanPosition()
-        loc_gho = gameState.getGhostPositions()[idx_gho]
-        print(f"pacman: {loc_pac}\tghost: {loc_gho}\t index: {idx_gho}")
+        loc_pac = list(gameState.getPacmanPosition())
+        loc_gho = list(gameState.getGhostPositions()[idx_gho])
 
         # find closest dimension
         x_diff = loc_gho[0] - loc_pac[0]
         y_diff = loc_gho[1] - loc_pac[1]
-        if (abs(x_diff) < abs(y_diff)):   smaller="x_diff"
-        else:                             smaller="y_diff"
-        print(f"x diff..{x_diff}\ty diff..{y_diff}\tcloser direction..{smaller}")
 
         # MOVE OPPOSITE OF WHATS CLOSER
         # for moving E-W; y_diff is smaller
@@ -319,17 +310,15 @@ class BasicAgentAA(BustersAgent):
             if (x_diff >  0) and Directions.EAST in legal:  move = Directions.EAST
             # if x_diff == 0 there is no match and move to else-case...
         # for moving N-S; x_diff is smaller or they're equal
-        elif (abs(x_diff) < abs(y_diff)):
+        elif (abs(x_diff) <= abs(y_diff)):
             if (y_diff <  0) and Directions.SOUTH in legal: move = Directions.SOUTH
             if (y_diff >  0) and Directions.NORTH in legal: move = Directions.NORTH
             if (x_diff == 0) and (y_diff == 0):             move = Directions.STOP
         else:
             move = Directions.STOP
 
-        print( f"if (x_diff <  0)  ->  {x_diff <  0}" )
-        print( f"if (x_diff >  0)  ->  {x_diff >  0}" )
-        print( f"if (y_diff <  0)  ->  {y_diff <  0}" )
-        print( f"if (y_diff >  0)  ->  {y_diff >  0}" )
+        while move == Directions.STOP:
+            move = legal[randint(0,len(legal)-1)]            
 
         # limitation -> it dsnt have a backup plan if theres a wall in the way lmao
 
@@ -340,82 +329,37 @@ class BasicAgentAA(BustersAgent):
         if   ( move_random == 2 ) and Directions.NORTH in legal:   move = Directions.NORTH
         if   ( move_random == 3 ) and Directions.SOUTH in legal: move = Directions.SOUTH
         """
-
-        move = self.bfs(gameState, loc_pac, loc_gho)
-
         return move
 
     def printLineData(self, gameState):
-        state = str(gameState.getPacmanPosition()[0]) + ',' + str(gameState.getPacmanPosition()[1]) + ',' + str(gameState.getScore())
+        # game & pacman stats
+        score = f"{gameState.getScore()}"
+        pacman_pos = f"{gameState.getPacmanPosition()[0]},{gameState.getPacmanPosition()[1]}"
 
+        # use manhattan distances list to check if ghost is dead -> put in 
+        # current coordinates or 'None' if it's dead.
+        ghost_dists_test = gameState.data.ghostDistances
+        if (type(ghost_dists_test[0]) == int):
+                 ghost0_pos = f"{gameState.getGhostPositions()[0][0]},{gameState.getGhostPositions()[0][1]}"
+        else:    ghost0_pos = f"{None},{None}"
+        if (type(ghost_dists_test[1]) == int):
+                 ghost1_pos = f"{gameState.getGhostPositions()[1][0]},{gameState.getGhostPositions()[1][1]}"
+        else:    ghost1_pos = f"{None},{None}"
+        if (type(ghost_dists_test[2]) == int):
+                 ghost2_pos = f"{gameState.getGhostPositions()[2][0]},{gameState.getGhostPositions()[2][1]}"
+        else:    ghost2_pos = f"{None},{None}"
+        if (type(ghost_dists_test[3]) == int):
+                 ghost3_pos = f"{gameState.getGhostPositions()[3][0]},{gameState.getGhostPositions()[3][1]}"
+        else:    ghost3_pos = f"{None},{None}"
 
-        print( f"ghost distances: {gameState.data.ghostDistances}" )
-        print( f"pacman position: {gameState.getPacmanPosition()}" )
-        print( f"ghost positions: {gameState.getGhostPositions()}" )
-        print( f"legal options... {gameState.getLegalActions()}" )
+        # get food & capsule stats
+        food = f"{gameState.getNumFood()}"
+        capsules = f"{len(gameState.getCapsules())}"
 
-        print()
-
+        # compile shortened statistic variables to one string to be appended to csv
+        state = f"{score},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos}"
 
         return state
 
-    def bfs(self, gameState, start, end):
-        class Node:
-            def __init__(self, state, action=None, parent=None):
-                self.state = state
-                self.action = action
-                self.parent = parent
-
-            def extract_solution(self):
-                """ Gets complete path from goal state to parent Node """
-                action_path = []
-                Node = self
-                while Node:
-                    if Node.action:
-                        action_path.append(Node.action)
-                    Node = Node.parent
-                return list(reversed(action_path))
-
-            def is_in_frontier(self, data_structure):
-                for n in data_structure.list:
-                    if n.state == self.state:
-                        return True
-                return False
-
-        # head of list -> 
-        head = Node(start)
-
-        if problem.isGoalState(head.state):
-            return head.extract_solution()
-
-
-        util.Queue()
-
-
-
-
-    """https://abhinavcreed13.github.io/projects/ai-project-search/#task-2-breadth-first-search"""
-
-    fringe = util.Queue()   # Fringe (Queue) to store the nodes along with their paths
-    visited_nodes = set()   # A set to maintain all the visited nodes
-    fringe.push((problem.getStartState(), []))   # Pushing (Node, [Path from start-node till 'Node']) to the fringe
-    while True:
-        popped_element = fringe.pop()
-        node = popped_element[0]
-        path_till_node = popped_element[1]
-        if problem.isGoalState(node):   # Exit on encountering goal node
-            break
-        else:
-            if node not in visited_nodes:  # Skipping already visited nodes
-                visited_nodes.add(node)    # Adding newly encountered nodes to the set of visited nodes
-                successors = problem.getSuccessors(node)
-                for successor in successors:
-                    child_node = successor[0]
-                    child_path = successor[1]
-                    full_path = path_till_node + [child_path]    # Computing path of child node from start node
-                    fringe.push((child_node, full_path))   # Pushing ('Child Node',[Full Path]) to the fringe
-
-    return path_till_node
-
-
-
+    def manhattan(self, p1, p2):
+        return sum(abs(v1-v2) for v1, v2 in zip(p1,p2))
