@@ -301,8 +301,8 @@ class BasicAgentAA(BustersAgent):
         print(f"closest ghost by index is..{idx_gho}\tdist is..{closest_ghost}")
 
         # get locations of pacman + closest ghost
-        loc_pac = list(gameState.getPacmanPosition())
-        loc_gho = list(gameState.getGhostPositions()[idx_gho])
+        loc_pac = gameState.getPacmanPosition()
+        loc_gho = gameState.getGhostPositions()[idx_gho]
         print(f"pacman: {loc_pac}\tghost: {loc_gho}\t index: {idx_gho}")
 
         # find closest dimension
@@ -340,6 +340,9 @@ class BasicAgentAA(BustersAgent):
         if   ( move_random == 2 ) and Directions.NORTH in legal:   move = Directions.NORTH
         if   ( move_random == 3 ) and Directions.SOUTH in legal: move = Directions.SOUTH
         """
+
+        move = self.bfs(gameState, loc_pac, loc_gho)
+
         return move
 
     def printLineData(self, gameState):
@@ -355,3 +358,64 @@ class BasicAgentAA(BustersAgent):
 
 
         return state
+
+    def bfs(self, gameState, start, end):
+        class Node:
+            def __init__(self, state, action=None, parent=None):
+                self.state = state
+                self.action = action
+                self.parent = parent
+
+            def extract_solution(self):
+                """ Gets complete path from goal state to parent Node """
+                action_path = []
+                Node = self
+                while Node:
+                    if Node.action:
+                        action_path.append(Node.action)
+                    Node = Node.parent
+                return list(reversed(action_path))
+
+            def is_in_frontier(self, data_structure):
+                for n in data_structure.list:
+                    if n.state == self.state:
+                        return True
+                return False
+
+        # head of list -> 
+        head = Node(start)
+
+        if problem.isGoalState(head.state):
+            return head.extract_solution()
+
+
+        util.Queue()
+
+
+
+
+    """https://abhinavcreed13.github.io/projects/ai-project-search/#task-2-breadth-first-search"""
+
+    fringe = util.Queue()   # Fringe (Queue) to store the nodes along with their paths
+    visited_nodes = set()   # A set to maintain all the visited nodes
+    fringe.push((problem.getStartState(), []))   # Pushing (Node, [Path from start-node till 'Node']) to the fringe
+    while True:
+        popped_element = fringe.pop()
+        node = popped_element[0]
+        path_till_node = popped_element[1]
+        if problem.isGoalState(node):   # Exit on encountering goal node
+            break
+        else:
+            if node not in visited_nodes:  # Skipping already visited nodes
+                visited_nodes.add(node)    # Adding newly encountered nodes to the set of visited nodes
+                successors = problem.getSuccessors(node)
+                for successor in successors:
+                    child_node = successor[0]
+                    child_path = successor[1]
+                    full_path = path_till_node + [child_path]    # Computing path of child node from start node
+                    fringe.push((child_node, full_path))   # Pushing ('Child Node',[Full Path]) to the fringe
+
+    return path_till_node
+
+
+
