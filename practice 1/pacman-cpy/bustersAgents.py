@@ -23,7 +23,7 @@ from keyboardAgents import KeyboardAgent
 import inference
 import busters
 from random import randint
-#from wekaI import Weka
+from wekaI import Weka
 
 class NullGraphics(object):
     "Placeholder for graphics"
@@ -77,8 +77,8 @@ class BustersAgent(object):
         self.inferenceModules = [inferenceType(a) for a in ghostAgents]
         self.observeEnable = observeEnable
         self.elapseTimeEnable = elapseTimeEnable
-        #self.weka = Weka()
-        #self.weka.start_jvm()
+        self.weka = Weka()
+        self.weka.start_jvm()
 
     def registerInitialState(self, gameState):
         "Initializes beliefs and inference modules"
@@ -111,6 +111,51 @@ class BustersAgent(object):
         "By default, a BustersAgent just stops.  This should be overridden."
         return Directions.STOP
 
+    def printLineData(self, gameState):
+        # game & pacman stats + archive prev score
+        if ('scoree' in locals()):
+            scoree_old = scoree
+            scoree = gameState.getScore()
+            current_score = f"{scoree_old}"
+        else:
+            scoree = gameState.getScore()
+            current_score = f"{None}"
+        
+        future_score = f"{scoree}"
+        pacman_pos = f"{gameState.getPacmanPosition()[0]},{gameState.getPacmanPosition()[1]}"
+        # previous move
+
+
+        # use manhattan distances list to check if ghost is dead -> put in 
+        # current coordinates or 'None' if it's dead.
+        ghost_dists_test = gameState.data.ghostDistances
+        if (type(ghost_dists_test[0]) == int):
+                 ghost0_pos = f"{gameState.getGhostPositions()[0][0]},{gameState.getGhostPositions()[0][1]}"
+        else:    ghost0_pos = f"{None},{None}"
+        if (type(ghost_dists_test[1]) == int):
+                 ghost1_pos = f"{gameState.getGhostPositions()[1][0]},{gameState.getGhostPositions()[1][1]}"
+        else:    ghost1_pos = f"{None},{None}"
+        if (type(ghost_dists_test[2]) == int):
+                 ghost2_pos = f"{gameState.getGhostPositions()[2][0]},{gameState.getGhostPositions()[2][1]}"
+        else:    ghost2_pos = f"{None},{None}"
+        if (type(ghost_dists_test[3]) == int):
+                 ghost3_pos = f"{gameState.getGhostPositions()[3][0]},{gameState.getGhostPositions()[3][1]}"
+        else:    ghost3_pos = f"{None},{None}"
+
+        # wall test
+        #print(type(gameState.getPacmanPosition()[0]))
+
+        # get food & capsule stats
+        food = f"{gameState.getNumFood()}"
+        capsules = f"{len(gameState.getCapsules())}"
+
+        # prev action
+        prev_action = f"{gameState.getPacmanState().getDirection()}"
+
+        # compile shortened statistic variables to one string to be appended to csv
+        state = f"{future_score},{current_score},{prev_action},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos}"
+
+        return state
 
 
 
@@ -378,9 +423,16 @@ class BasicAgentAA(BustersAgent):
         return move
 
     def printLineData(self, gameState):
-        # game & pacman stats
-        score = f"{gameState.getScore()}"
-        prev_score = f"{gameState.getScore()-1}"
+        # game & pacman stats + archive prev score
+        if ('scoree' in locals()):
+            scoree_old = scoree
+            scoree = gameState.getScore()
+            current_score = f"{scoree_old}"
+        else:
+            scoree = gameState.getScore()
+            current_score = f"{None}"
+        
+        future_score = f"{scoree}"
         pacman_pos = f"{gameState.getPacmanPosition()[0]},{gameState.getPacmanPosition()[1]}"
         # previous move
 
@@ -412,7 +464,7 @@ class BasicAgentAA(BustersAgent):
         prev_action = f"{gameState.getPacmanState().getDirection()}"
 
         # compile shortened statistic variables to one string to be appended to csv
-        state = f"{score},{prev_score},{prev_action},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos}"
+        state = f"{future_score},{current_score},{prev_action},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos}"
 
         return state
 
