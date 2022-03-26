@@ -112,54 +112,7 @@ class BustersAgent(object):
         return Directions.STOP
 
     def printLineData(self, gameState):
-        # game score + archive prev score
-        if ('scoree' in locals()):
-            current_score = future_score
-            future_score = f"{gameState.getScore()}"
-        else:
-            future_score = f"{gameState.getScore()}"
-            current_score = f"{None}"
-
-        # pacman position
-        pacman_pos = f"{gameState.getPacmanPosition()[0]},{gameState.getPacmanPosition()[1]}"
-
-        # use manhattan distances list to check if ghost is dead -> put in 
-        # current coordinates or 'None' if it's dead.
-        ghost_dists_test = gameState.data.ghostDistances
-        if (type(ghost_dists_test[0]) == int):
-                 ghost0_pos = f"{gameState.getGhostPositions()[0][0]},{gameState.getGhostPositions()[0][1]}"
-        else:    ghost0_pos = f"{None},{None}"
-        if (type(ghost_dists_test[1]) == int):
-                 ghost1_pos = f"{gameState.getGhostPositions()[1][0]},{gameState.getGhostPositions()[1][1]}"
-        else:    ghost1_pos = f"{None},{None}"
-        if (type(ghost_dists_test[2]) == int):
-                 ghost2_pos = f"{gameState.getGhostPositions()[2][0]},{gameState.getGhostPositions()[2][1]}"
-        else:    ghost2_pos = f"{None},{None}"
-        if (type(ghost_dists_test[3]) == int):
-                 ghost3_pos = f"{gameState.getGhostPositions()[3][0]},{gameState.getGhostPositions()[3][1]}"
-        else:    ghost3_pos = f"{None},{None}"
-
-        # wall test / legal moves
-        ORDER = ['North', 'South', 'East', 'West', 'Stop']
-        actions_list = []  # binary boolean
-        for x in gameState.getLegalActions():
-            if x in ORDER:
-                actions_list.append(1)
-            else:
-                actions_list.append(0)
-        legal_moves = ','.join(actions_list)
-
-        # get food & capsule stats
-        food = f"{gameState.getNumFood()}"
-        capsules = f"{len(gameState.getCapsules())}"
-
-        # prev action
-        prev_action = f"{gameState.getPacmanState().getDirection()}"
-
-        # compile shortened statistic variables to one string to be appended to csv
-        state = f"{future_score},{current_score},{prev_action},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos},{legal_moves}"
-
-        return state
+        return globalPrintLineData(gameState)
 
 
 class BustersKeyboardAgent(BustersAgent, KeyboardAgent):
@@ -176,44 +129,7 @@ class BustersKeyboardAgent(BustersAgent, KeyboardAgent):
         return KeyboardAgent.getAction(self, gameState)
 
     def printLineData(self, gameState):
-        # game & pacman stats
-        score = f"{gameState.getScore()}"
-        prev_score = f"{gameState.getScore()-1}"
-        pacman_pos = f"{gameState.getPacmanPosition()[0]},{gameState.getPacmanPosition()[1]}"
-        # previous move
-
-
-        # use manhattan distances list to check if ghost is dead -> put in 
-        # current coordinates or 'None' if it's dead.
-        ghost_dists_test = gameState.data.ghostDistances
-        if (type(ghost_dists_test[0]) == int):
-                 ghost0_pos = f"{gameState.getGhostPositions()[0][0]},{gameState.getGhostPositions()[0][1]}"
-        else:    ghost0_pos = f"{None},{None}"
-        if (type(ghost_dists_test[1]) == int):
-                 ghost1_pos = f"{gameState.getGhostPositions()[1][0]},{gameState.getGhostPositions()[1][1]}"
-        else:    ghost1_pos = f"{None},{None}"
-        if (type(ghost_dists_test[2]) == int):
-                 ghost2_pos = f"{gameState.getGhostPositions()[2][0]},{gameState.getGhostPositions()[2][1]}"
-        else:    ghost2_pos = f"{None},{None}"
-        if (type(ghost_dists_test[3]) == int):
-                 ghost3_pos = f"{gameState.getGhostPositions()[3][0]},{gameState.getGhostPositions()[3][1]}"
-        else:    ghost3_pos = f"{None},{None}"
-
-        # wall test
-        #print(type(gameState.getPacmanPosition()[0]))
-
-        # get food & capsule stats
-        food = f"{gameState.getNumFood()}"
-        capsules = f"{len(gameState.getCapsules())}"
-
-        # prev action
-        prev_action = f"{gameState.getPacmanState().getDirection()}"
-
-        # compile shortened statistic variables to one string to be appended to csv
-        state = f"{score},{prev_score},{prev_action},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos}"
-
-        return state
-
+        return globalPrintLineData(gameState)
 
 from distanceCalculator import Distancer
 from game import Actions
@@ -426,54 +342,62 @@ class BasicAgentAA(BustersAgent):
         return move
 
     def printLineData(self, gameState):
-        # game score + archive prev score
-        if ('scoree' in locals()):
-            current_score = future_score
-            future_score = f"{gameState.getScore()}"
-        else:
-            future_score = f"{gameState.getScore()}"
-            current_score = f"{None}"
-
-        # pacman position
-        pacman_pos = f"{gameState.getPacmanPosition()[0]},{gameState.getPacmanPosition()[1]}"
-
-        # use manhattan distances list to check if ghost is dead -> put in 
-        # current coordinates or 'None' if it's dead.
-        ghost_dists_test = gameState.data.ghostDistances
-        if (type(ghost_dists_test[0]) == int):
-                 ghost0_pos = f"{gameState.getGhostPositions()[0][0]},{gameState.getGhostPositions()[0][1]}"
-        else:    ghost0_pos = f"{None},{None}"
-        if (type(ghost_dists_test[1]) == int):
-                 ghost1_pos = f"{gameState.getGhostPositions()[1][0]},{gameState.getGhostPositions()[1][1]}"
-        else:    ghost1_pos = f"{None},{None}"
-        if (type(ghost_dists_test[2]) == int):
-                 ghost2_pos = f"{gameState.getGhostPositions()[2][0]},{gameState.getGhostPositions()[2][1]}"
-        else:    ghost2_pos = f"{None},{None}"
-        if (type(ghost_dists_test[3]) == int):
-                 ghost3_pos = f"{gameState.getGhostPositions()[3][0]},{gameState.getGhostPositions()[3][1]}"
-        else:    ghost3_pos = f"{None},{None}"
-
-        # wall test / legal moves
-        #print(type(gameState.getPacmanPosition()[0]))
-        #ORDER = 
-        print(gameState.getLegalActions())
-        #for x in gameState.getLegalActions():
-        #    actions_list = 
-        #ORDER = 
-        #legal_moves = ','.join(LIST)
-        legal_moves = ''
-
-        # get food & capsule stats
-        food = f"{gameState.getNumFood()}"
-        capsules = f"{len(gameState.getCapsules())}"
-
-        # prev action
-        prev_action = f"{gameState.getPacmanState().getDirection()}"
-
-        # compile shortened statistic variables to one string to be appended to csv
-        state = f"{future_score},{current_score},{prev_action},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos},{legal_moves}"
-
-        return state
+        return globalPrintLineData(gameState)
 
     def manhattan(self, p1, p2):
         return sum(abs(v1-v2) for v1, v2 in zip(p1,p2))
+
+
+################################################################################
+#      MAKE GLOBAL printLineData() => CONSISTENCY & LESS COPY-PASTED CODE      #
+################################################################################
+
+def globalPrintLineData(gameState):
+    # game score + archive prev score
+    if ('scoree' in locals()):
+        current_score = future_score
+        future_score = f"{gameState.getScore()}"
+    else:
+        future_score = f"{gameState.getScore()}"
+        current_score = f"{None}"
+
+    # pacman position
+    pacman_pos = f"{gameState.getPacmanPosition()[0]},{gameState.getPacmanPosition()[1]}"
+
+    # use manhattan distances list to check if ghost is dead -> put in 
+    # current coordinates or 'None' if it's dead.
+    ghost_dists_test = gameState.data.ghostDistances
+    if (type(ghost_dists_test[0]) == int):
+             ghost0_pos = f"{gameState.getGhostPositions()[0][0]},{gameState.getGhostPositions()[0][1]}"
+    else:    ghost0_pos = f"{None},{None}"
+    if (type(ghost_dists_test[1]) == int):
+             ghost1_pos = f"{gameState.getGhostPositions()[1][0]},{gameState.getGhostPositions()[1][1]}"
+    else:    ghost1_pos = f"{None},{None}"
+    if (type(ghost_dists_test[2]) == int):
+             ghost2_pos = f"{gameState.getGhostPositions()[2][0]},{gameState.getGhostPositions()[2][1]}"
+    else:    ghost2_pos = f"{None},{None}"
+    if (type(ghost_dists_test[3]) == int):
+             ghost3_pos = f"{gameState.getGhostPositions()[3][0]},{gameState.getGhostPositions()[3][1]}"
+    else:    ghost3_pos = f"{None},{None}"
+
+    # wall test / legal moves
+    ORDER = ['North', 'South', 'East', 'West', 'Stop']
+    actions_list = []  # binary boolean
+    for x in gameState.getLegalActions():
+        if x in ORDER:
+            actions_list.append(1)
+        else:
+            actions_list.append(0)
+    legal_moves = ','.join(actions_list)
+
+    # get food & capsule stats
+    food = f"{gameState.getNumFood()}"
+    capsules = f"{len(gameState.getCapsules())}"
+
+    # prev action
+    prev_action = f"{gameState.getPacmanState().getDirection()}"
+
+    # compile shortened statistic variables to one string to be appended to csv
+    state = f"{future_score},{current_score},{prev_action},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos},{legal_moves}"
+
+    return state
