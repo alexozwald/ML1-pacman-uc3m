@@ -105,7 +105,26 @@ class BustersAgent(object):
         #        inf.observeState(gameState)
         #    self.ghostBeliefs[index] = inf.getBeliefDistribution()
         #self.display.updateDistributions(self.ghostBeliefs)
-        return self.chooseAction(gameState)
+        
+        lineData = globalPrintLineData(gameState)
+        curr_model = "./models/training_keyboard/J48-training.model"
+        curr_data = "./data-collected/training_keyboard.arff"
+        #curr_model = "./models/training_tutorial1/J48-training.model"
+        #curr_data = "./data-collected/training_tutorial1.arff"
+        move = self.weka.predict(curr_model, lineData, curr_data)
+
+        # get legal actions
+        legal = gameState.getLegalActions(0)
+
+        # check legality -> correct if not legal.
+        if move not in legal:
+            print(f"FYI: using random bc weka move not legal\tweka: {move}",end="")
+            move = legal[randint(0,len(legal)-1)]
+            print(f"random: {move}")
+        else:
+            print(f"Using legal Weka prediction!\tweka: {move}")
+
+        return move
 
     def chooseAction(self, gameState):
         "By default, a BustersAgent just stops.  This should be overridden."
@@ -352,7 +371,7 @@ class BasicAgentAA(BustersAgent):
 #      MAKE GLOBAL printLineData() => CONSISTENCY & LESS COPY-PASTED CODE      #
 ################################################################################
 
-def globalPrintLineData(gameState):
+def globalPrintLineData(gameState, *, useOld=False):
     # game score + archive prev score
     if ('scoree' in locals()):
         current_score = future_score
@@ -385,9 +404,9 @@ def globalPrintLineData(gameState):
     actions_list = []  # binary boolean
     for x in gameState.getLegalActions():
         if x in ORDER:
-            actions_list.append(1)
+            actions_list.append(str(1))
         else:
-            actions_list.append(0)
+            actions_list.append(str(0))
     legal_moves = ','.join(actions_list)
 
     # get food & capsule stats
@@ -398,6 +417,11 @@ def globalPrintLineData(gameState):
     prev_action = f"{gameState.getPacmanState().getDirection()}"
 
     # compile shortened statistic variables to one string to be appended to csv
-    state = f"{future_score},{current_score},{prev_action},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos},{legal_moves}"
+    if not useOld:
+        state = f"{future_score},{current_score},{prev_action},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos},{legal_moves}"
+    else:
+        state = f"{future_score},{current_score},{prev_action},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos}"
+
+
 
     return state
