@@ -418,10 +418,8 @@ def globalPrintLineData(gameState, *, useOld=False):
 
     # compile shortened statistic variables to one string to be appended to csv
     if not useOld:
-        state = f"{future_score},{current_score},{prev_action},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos},{legal_moves}"
+        state = f"{future_score},{current_score},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos},{legal_moves},{prev_action}"
     else:
-        state = f"{future_score},{current_score},{prev_action},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos}"
-
-
-
+        state = f"{future_score},{current_score},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos},{prev_action}"
+    
     return state

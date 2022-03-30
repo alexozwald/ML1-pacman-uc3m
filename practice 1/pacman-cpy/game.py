@@ -624,7 +624,7 @@ class Game(object):
         ExistingFile = os.path.isfile("ex.csv") 
         if not ExistingFile:
             with open("ex.csv","a") as f:
-                f.write("future_score,score,action,num_food,num_capsules,pacman_x,pacman_y,ghost0_x,ghost0_y,ghost1_x,ghost1_y,ghost2_x,ghost2_y,ghost3_x,ghost3_y,north,south,east,west,stop\n")
+                f.write("future_score,score,num_food,num_capsules,pacman_x,pacman_y,ghost0_x,ghost0_y,ghost1_x,ghost1_y,ghost2_x,ghost2_y,ghost3_x,ghost3_y,north,south,east,west,stop,prev_action\n")
 
 
         while not self.gameOver:
