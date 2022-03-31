@@ -23,7 +23,7 @@ from keyboardAgents import KeyboardAgent
 import inference
 import busters
 from random import randint
-from wekaI import Weka
+#from wekaI import Weka
 
 class NullGraphics(object):
     "Placeholder for graphics"
@@ -77,8 +77,8 @@ class BustersAgent(object):
         self.inferenceModules = [inferenceType(a) for a in ghostAgents]
         self.observeEnable = observeEnable
         self.elapseTimeEnable = elapseTimeEnable
-        self.weka = Weka()
-        self.weka.start_jvm()
+        #self.weka = Weka()
+        #self.weka.start_jvm()
 
     def registerInitialState(self, gameState):
         "Initializes beliefs and inference modules"
@@ -111,7 +111,8 @@ class BustersAgent(object):
         curr_data = "./data-collected/training_keyboard.arff"
         #curr_model = "./models/training_tutorial1/J48-training.model"
         #curr_data = "./data-collected/training_tutorial1.arff"
-        move = self.weka.predict(curr_model, lineData, curr_data)
+        #move = self.weka.predict(curr_model, lineData, curr_data)
+        move = Directions.STOP
 
         # get legal actions
         legal = gameState.getLegalActions(0)
@@ -421,5 +422,6 @@ def globalPrintLineData(gameState, *, useOld=False):
         state = f"{future_score},{current_score},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos},{legal_moves},{prev_action}"
     else:
         state = f"{future_score},{current_score},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos},{prev_action}"
-    
+    # LAST listed attribute is the 
+
     return state
