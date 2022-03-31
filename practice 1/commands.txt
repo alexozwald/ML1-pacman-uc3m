@@ -34,29 +34,29 @@ py busters.py -p BustersKeyboardAgent -g RandomGhost -l 20Hunt
 
 ## training_tutorial1.arff
 
-py busters.py -p BasicAgentAA -g RandomGhost -l classic
-py busters.py -p BasicAgentAA -g RandomGhost -l openClassic
-py busters.py -p BasicAgentAA -g RandomGhost -l smallClassic
-py busters.py -p BasicAgentAA -g RandomGhost -l smallHunt
-py busters.py -p BasicAgentAA -g RandomGhost -l bigHunt
-py busters.py -p BasicAgentAA -l smallHunt
-py busters.py -p BasicAgentAA -l openClassic
-py busters.py -p BasicAgentAA -l smallClassic
-py busters.py -p BasicAgentAA -l smallHunt
-py busters.py -p BasicAgentAA -l bigHunt
+py busters.py -p Tutorial1 -g RandomGhost -l classic
+py busters.py -p Tutorial1 -g RandomGhost -l openClassic
+py busters.py -p Tutorial1 -g RandomGhost -l smallClassic
+py busters.py -p Tutorial1 -g RandomGhost -l smallHunt
+py busters.py -p Tutorial1 -g RandomGhost -l bigHunt
+py busters.py -p Tutorial1 -l smallHunt
+py busters.py -p Tutorial1 -l openClassic
+py busters.py -p Tutorial1 -l smallClassic
+py busters.py -p Tutorial1 -l smallHunt
+py busters.py -p Tutorial1 -l bigHunt
 
 ## test_samemaps_tutorial1.arff
 
-py busters.py -p BasicAgentAA -g RandomGhost -l classic
-py busters.py -p BasicAgentAA -g RandomGhost -l openClassic
-py busters.py -p BasicAgentAA -g RandomGhost -l smallClassic
-py busters.py -p BasicAgentAA -g RandomGhost -l smallHunt
-py busters.py -p BasicAgentAA -g RandomGhost -l bigHunt
+py busters.py -p Tutorial1 -g RandomGhost -l classic
+py busters.py -p Tutorial1 -g RandomGhost -l openClassic
+py busters.py -p Tutorial1 -g RandomGhost -l smallClassic
+py busters.py -p Tutorial1 -g RandomGhost -l smallHunt
+py busters.py -p Tutorial1 -g RandomGhost -l bigHunt
 
 ## test_othermaps_tutorial1.arff
 
-py busters.py -p BasicAgentAA -g RandomGhost -l mediumClassic
-py busters.py -p BasicAgentAA -g RandomGhost -l minimaxClassic
-py busters.py -p BasicAgentAA -g RandomGhost -l contestClassic
-py busters.py -p BasicAgentAA -g RandomGhost -l capsuleClassic
-py busters.py -p BasicAgentAA -g RandomGhost -l 20Hunt
+py busters.py -p Tutorial1 -g RandomGhost -l mediumClassic
+py busters.py -p Tutorial1 -g RandomGhost -l minimaxClassic
+py busters.py -p Tutorial1 -g RandomGhost -l contestClassic
+py busters.py -p Tutorial1 -g RandomGhost -l capsuleClassic
+py busters.py -p Tutorial1 -g RandomGhost -l 20Hunt
