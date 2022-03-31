@@ -407,7 +407,7 @@ class Tutorial1(BustersAgent):
         while move == Directions.STOP:
             move = legal[randint(0,len(legal)-1)]            
 
-        # limitation -> it dsnt have a backup plan if theres a wall in the way lmao
+        # limitation -> it dsnt have a backup plan if theres a corner or >1 wall
 
         """ORIGINAL CODE
         move_random = random.randint(0, 3)
@@ -427,14 +427,19 @@ class Tutorial1(BustersAgent):
 
 '''Agent Connected to Weka'''
 class WekaAgent(BustersAgent):
+    def __init__(self):
+        self.weka = Weka()
+        self.weka.start_jvm()
+
+
     def getAction(self, gameState):
         lineData = globalPrintLineData(gameState)
         curr_model = "./models/training_keyboard/J48-training.model"
         curr_data = "./data-collected/training_keyboard.arff"
         #curr_model = "./models/training_tutorial1/J48-training.model"
         #curr_data = "./data-collected/training_tutorial1.arff"
-        #move = self.weka.predict(curr_model, lineData, curr_data)
-        move = Directions.STOP
+        move = self.weka.predict(curr_model, lineData, curr_data)
+        #move = Directions.STOP
 
         # get legal actions
         legal = gameState.getLegalActions(0)
