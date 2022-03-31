@@ -1,6 +1,6 @@
-commands.txt
+# commands.txt
 
-training_keyboard.arff
+## training_keyboard.arff
 
 py busters.py -p BustersKeyboardAgent -l classic
 py busters.py -p BustersKeyboardAgent -g RandomGhost -l classic
@@ -13,7 +13,7 @@ py busters.py -p BustersKeyboardAgent -g RandomGhost -l smallHunt
 py busters.py -p BustersKeyboardAgent -l bigHunt
 py busters.py -p BustersKeyboardAgent -g RandomGhost -l bigHunt
 
-test_samemaps_keyboard.arff
+## test_samemaps_keyboard.arff
 
 py busters.py -p BustersKeyboardAgent -g RandomGhost -l smallClassic -n 7
 
@@ -24,7 +24,7 @@ py busters.py -p BustersKeyboardAgent -g RandomGhost -l smallHunt
 py busters.py -p BustersKeyboardAgent -g RandomGhost -l bigHunt
 
 
-test_othermaps_keyboard.arff
+## test_othermaps_keyboard.arff
 
 py busters.py -p BustersKeyboardAgent -g RandomGhost -l mediumClassic
 py busters.py -p BustersKeyboardAgent -g RandomGhost -l minimaxClassic
@@ -32,7 +32,7 @@ py busters.py -p BustersKeyboardAgent -g RandomGhost -l contestClassic
 py busters.py -p BustersKeyboardAgent -g RandomGhost -l capsuleClassic
 py busters.py -p BustersKeyboardAgent -g RandomGhost -l 20Hunt
 
-training_tutorial1.arff
+## training_tutorial1.arff
 
 py busters.py -p BasicAgentAA -g RandomGhost -l classic
 py busters.py -p BasicAgentAA -g RandomGhost -l openClassic
@@ -45,7 +45,7 @@ py busters.py -p BasicAgentAA -l smallClassic
 py busters.py -p BasicAgentAA -l smallHunt
 py busters.py -p BasicAgentAA -l bigHunt
 
-test_samemaps_tutorial1.arff
+## test_samemaps_tutorial1.arff
 
 py busters.py -p BasicAgentAA -g RandomGhost -l classic
 py busters.py -p BasicAgentAA -g RandomGhost -l openClassic
@@ -53,7 +53,7 @@ py busters.py -p BasicAgentAA -g RandomGhost -l smallClassic
 py busters.py -p BasicAgentAA -g RandomGhost -l smallHunt
 py busters.py -p BasicAgentAA -g RandomGhost -l bigHunt
 
-test_othermaps_tutorial1.arff
+## test_othermaps_tutorial1.arff
 
 py busters.py -p BasicAgentAA -g RandomGhost -l mediumClassic
 py busters.py -p BasicAgentAA -g RandomGhost -l minimaxClassic

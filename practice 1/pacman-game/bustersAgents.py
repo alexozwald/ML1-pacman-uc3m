@@ -12,7 +12,7 @@ from __future__ import print_function
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
-
+# default imports
 from builtins import range
 from builtins import object
 import util
@@ -21,6 +21,10 @@ from game import Directions
 from keyboardAgents import KeyboardAgent
 import inference
 import busters
+
+# our imports
+from random import randint
+from wekaI import Weka
 
 class NullGraphics(object):
     "Placeholder for graphics"
@@ -452,14 +456,19 @@ class WekaAgent(BustersAgent):
 #      MAKE GLOBAL printLineData() => CONSISTENCY & LESS COPY-PASTED CODE      #
 ################################################################################
 
+future_score = ""
+current_score = "0"
+
 def globalPrintLineData(gameState, *, useOld=False):
     # game score + archive prev score
-    if ('scoree' in locals()):
+    global future_score
+    global current_score
+    if (future_score != ""):
         current_score = future_score
         future_score = f"{gameState.getScore()}"
     else:
         future_score = f"{gameState.getScore()}"
-        current_score = f"{None}"
+        current_score = f"{0}"
 
     # pacman position
     pacman_pos = f"{gameState.getPacmanPosition()[0]},{gameState.getPacmanPosition()[1]}"
@@ -469,16 +478,16 @@ def globalPrintLineData(gameState, *, useOld=False):
     ghost_dists_test = gameState.data.ghostDistances
     if (type(ghost_dists_test[0]) == int):
              ghost0_pos = f"{gameState.getGhostPositions()[0][0]},{gameState.getGhostPositions()[0][1]}"
-    else:    ghost0_pos = f"{None},{None}"
+    else:    ghost0_pos = f"{-1},{-1}"
     if (type(ghost_dists_test[1]) == int):
              ghost1_pos = f"{gameState.getGhostPositions()[1][0]},{gameState.getGhostPositions()[1][1]}"
-    else:    ghost1_pos = f"{None},{None}"
+    else:    ghost1_pos = f"{-1},{-1}"
     if (type(ghost_dists_test[2]) == int):
              ghost2_pos = f"{gameState.getGhostPositions()[2][0]},{gameState.getGhostPositions()[2][1]}"
-    else:    ghost2_pos = f"{None},{None}"
+    else:    ghost2_pos = f"{-1},{-1}"
     if (type(ghost_dists_test[3]) == int):
              ghost3_pos = f"{gameState.getGhostPositions()[3][0]},{gameState.getGhostPositions()[3][1]}"
-    else:    ghost3_pos = f"{None},{None}"
+    else:    ghost3_pos = f"{-1},{-1}"
 
     # wall test / legal moves
     ORDER = ['North', 'South', 'East', 'West', 'Stop']
