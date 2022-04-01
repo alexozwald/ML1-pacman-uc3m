@@ -50,6 +50,7 @@ class Distancer(object):
 
     # Start computing distances in the background; when the dc finishes,
     # it will fill in self._distances for us.
+    self.dc = DistanceCalculator()
     dc = DistanceCalculator()
     dc.setAttr(layout, self)
     dc.setDaemon(True)

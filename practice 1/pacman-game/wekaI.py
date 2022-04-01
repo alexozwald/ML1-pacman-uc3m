@@ -54,7 +54,7 @@ class Weka:
 		for i in range(0, data.num_attributes):
 			attribute = data.attribute(i)
 			if attribute.is_nominal:
-				x[i] = attribute.index_of(x[i]) 			
+				x[i] = attribute.index_of(x[i])
 
 		# Realiza la prediccion		
 		inst = Instance.create_instance(x) 

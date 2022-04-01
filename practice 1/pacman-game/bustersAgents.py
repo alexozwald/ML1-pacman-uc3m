@@ -131,7 +131,7 @@ class BustersKeyboardAgent(BustersAgent, KeyboardAgent):
     def chooseAction(self, gameState):
         return KeyboardAgent.getAction(self, gameState)
 
-from distanceCalculator import Distancer
+from distanceCalculator import DistanceCalculator, Distancer
 from game import Actions
 from game import Directions
 import random, sys
@@ -295,64 +295,13 @@ class BasicAgentAA(BustersAgent):
 ################################################################################
 '''Agent Made in Tutorial1'''
 class Tutorial1(BustersAgent):
-
     def registerInitialState(self, gameState):
         BustersAgent.registerInitialState(self, gameState)
         self.distancer = Distancer(gameState.data.layout, False)
+        print(self.distancer.getDistance(gameState.getPacmanPosition(),gameState.getGhostPositions()[1]))
+
         self.countActions = 0
         
-    ''' Example of counting something'''
-    def countFood(self, gameState):
-        food = 0
-        for width in gameState.data.food:
-            for height in width:
-                if(height == True):
-                    food = food + 1
-        return food
-    
-    ''' Print the layout'''  
-    def printGrid(self, gameState):
-        table = ""
-        #print(gameState.data.layout) ## Print by terminal
-        for x in range(gameState.data.layout.width):
-            for y in range(gameState.data.layout.height):
-                food, walls = gameState.data.food, gameState.data.layout.walls
-                table = table + gameState.data._foodWallStr(food[x][y], walls[x][y]) + ","
-        table = table[:-1]
-        return table
-
-    def printInfo(self, gameState):
-        print("---------------- TICK ", self.countActions, " --------------------------")
-        # Map size
-        width, height = gameState.data.layout.width, gameState.data.layout.height
-        print("Width: ", width, " Height: ", height)
-        # Pacman position
-        print("Pacman position: ", gameState.getPacmanPosition())
-        # Legal actions for Pacman in current position
-        print("Legal actions: ", gameState.getLegalPacmanActions())
-        # Pacman direction
-        print("Pacman direction: ", gameState.data.agentStates[0].getDirection())
-        # Number of ghosts
-        print("Number of ghosts: ", gameState.getNumAgents() - 1)
-        # Alive ghosts (index 0 corresponds to Pacman and is always false)
-        print("Living ghosts: ", gameState.getLivingGhosts())
-        # Ghosts positions
-        print("Ghosts positions: ", gameState.getGhostPositions())
-        # Ghosts directions
-        print("Ghosts directions: ", [gameState.getGhostDirections().get(i) for i in range(0, gameState.getNumAgents() - 1)])
-        # Manhattan distance to ghosts
-        print("Ghosts distances: ", gameState.data.ghostDistances)
-        # Pending pac dots
-        print("Pac dots: ", gameState.getNumFood())
-        # Manhattan distance to the closest pac dot
-        print("Distance nearest pac dots: ", gameState.getDistanceNearestFood())
-        # Map walls
-        print("Map:")
-        print( gameState.getWalls())
-        # Score
-        print("Score: ", gameState.getScore())
-
-
     def chooseAction(self, gameState):
         self.countActions = self.countActions + 1
         #self.printInfo(gameState)
@@ -426,11 +375,29 @@ class Tutorial1(BustersAgent):
 
 
 '''Agent Connected to Weka'''
-class WekaAgent(BustersAgent):
-    def __init__(self):
+class WekaAgent(object):
+    def __init__( self, index = 0, inference = "ExactInference", ghostAgents = None, observeEnable = True, elapseTimeEnable = True):
+        inferenceType = util.lookup(inference, globals())
+        self.inferenceModules = [inferenceType(a) for a in ghostAgents]
+        self.observeEnable = observeEnable
+        self.elapseTimeEnable = elapseTimeEnable
         self.weka = Weka()
         self.weka.start_jvm()
 
+    def registerInitialState(self, gameState):
+        "Initializes beliefs and inference modules"
+        import __main__
+        self.display = __main__._display
+        for inference in self.inferenceModules:
+            inference.initialize(gameState)
+        self.ghostBeliefs = [inf.getBeliefDistribution() for inf in self.inferenceModules]
+        self.firstMove = True
+
+    def observationFunction(self, gameState):
+        "Removes the ghost states from the gameState"
+        agents = gameState.data.agentStates
+        gameState.data.agentStates = [agents[0]] + [None for i in range(1, len(agents))]
+        return gameState
 
     def getAction(self, gameState):
         lineData = globalPrintLineData(gameState)
@@ -456,6 +423,7 @@ class WekaAgent(BustersAgent):
 
     def printLineData(self, gameState):
         return globalPrintLineData(gameState)
+
 
 ################################################################################
 #      MAKE GLOBAL printLineData() => CONSISTENCY & LESS COPY-PASTED CODE      #
@@ -495,13 +463,16 @@ def globalPrintLineData(gameState, *, useOld=False):
     else:    ghost3_pos = f"{-1},{-1}"
 
     # wall test / legal moves
-    ORDER = ['North', 'South', 'East', 'West', 'Stop']
-    actions_list = []  # binary boolean
-    for x in gameState.getLegalActions():
-        if x in ORDER:
-            actions_list.append(str(1))
+    #ORDER = ['North', 'South', 'East', 'West', 'Stop']
+    ORDER = [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST, Directions.STOP]
+    legal_actions = gameState.getLegalActions()
+    actions_list = []
+    # binary boolean
+    for x in ORDER:
+        if x in legal_actions:
+            actions_list.append("1")
         else:
-            actions_list.append(str(0))
+            actions_list.append("0")
     legal_moves = ','.join(actions_list)
 
     # get food & capsule stats
