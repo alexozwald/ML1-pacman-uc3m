@@ -294,84 +294,67 @@ class BasicAgentAA(BustersAgent):
 #                                  OUR AGENTS                                  #
 ################################################################################
 '''Agent Made in Tutorial1'''
-class Tutorial1(BustersAgent):
+class UpgradedAgent(BustersAgent):
     def registerInitialState(self, gameState):
         BustersAgent.registerInitialState(self, gameState)
         self.distancer = Distancer(gameState.data.layout, False)
         print(self.distancer.getDistance(gameState.getPacmanPosition(),gameState.getGhostPositions()[1]))
 
-        self.countActions = 0
+    def printLineData(self, gameState):
+        return globalPrintLineData(gameState)
         
     def chooseAction(self, gameState):
         self.countActions = self.countActions + 1
-        #self.printInfo(gameState)
         move = Directions.STOP
         legal = gameState.getLegalActions(0) ##Legal position from the pacman
-
-        # find closest ghost (with index) using manhattan data
-        man_dists = gameState.data.ghostDistances
-        # find min from list (cant use min() if one ghost is already dead and it
-        # becomes None-Type instead of a tuple).  also keep track of distances.
-        closest_ghost = 100
-
-        if ((type(man_dists[0]) == int) and (man_dists[0] < closest_ghost)):
-            closest_ghost = man_dists[0]
-            idx_gho = man_dists.index(closest_ghost)
-        if ((type(man_dists[1]) == int) and (man_dists[1] < closest_ghost)):
-            closest_ghost = man_dists[1]
-            idx_gho = man_dists.index(closest_ghost)
-        if ((type(man_dists[2]) == int) and (man_dists[2] < closest_ghost)):
-            closest_ghost = man_dists[2]
-            idx_gho = man_dists.index(closest_ghost)
-        if ((type(man_dists[3]) == int) and (man_dists[3] < closest_ghost)):
-            closest_ghost = man_dists[3]
-            idx_gho = man_dists.index(closest_ghost)
-        if closest_ghost == 100:
-            print("Error finding closest ghost -> no living ghosts")
-            move = Directions.STOP
-            return move
-
-        # get locations of pacman + closest ghost
-        loc_pac = list(gameState.getPacmanPosition())
-        loc_gho = list(gameState.getGhostPositions()[idx_gho])
-
-        # find closest dimension
-        x_diff = loc_gho[0] - loc_pac[0]
-        y_diff = loc_gho[1] - loc_pac[1]
-
-        # MOVE OPPOSITE OF WHATS CLOSER
-        # for moving E-W; y_diff is smaller
-        if (abs(x_diff) > abs(y_diff)):
-            if (x_diff <  0) and Directions.WEST in legal:  move = Directions.WEST
-            if (x_diff >  0) and Directions.EAST in legal:  move = Directions.EAST
-            # if x_diff == 0 there is no match and move to else-case...
-        # for moving N-S; x_diff is smaller or they're equal
-        elif (abs(x_diff) <= abs(y_diff)):
-            if (y_diff <  0) and Directions.SOUTH in legal: move = Directions.SOUTH
-            if (y_diff >  0) and Directions.NORTH in legal: move = Directions.NORTH
-            if (x_diff == 0) and (y_diff == 0):             move = Directions.STOP
-        else:
-            move = Directions.STOP
 
         while move == Directions.STOP:
             move = legal[randint(0,len(legal)-1)]            
 
-        # limitation -> it dsnt have a backup plan if theres a corner or >1 wall
-
-        """ORIGINAL CODE
-        move_random = random.randint(0, 3)
-        if   ( move_random == 0 ) and Directions.WEST in legal:  move = Directions.WEST
-        if   ( move_random == 1 ) and Directions.EAST in legal: move = Directions.EAST
-        if   ( move_random == 2 ) and Directions.NORTH in legal:   move = Directions.NORTH
-        if   ( move_random == 3 ) and Directions.SOUTH in legal: move = Directions.SOUTH
-        """
         return move
 
-    def printLineData(self, gameState):
-        return globalPrintLineData(gameState)
+    def hotgirlsearch(self, gameState):
+        layout = gameState.data.layout
+        
 
-    def manhattan(self, p1, p2):
-        return sum(abs(v1-v2) for v1, v2 in zip(p1,p2))
+    class searchNode():
+        def __init__(self, state, action=None, g=None, h=None, parent=None):
+            self.state = state
+            self.action = action
+            self.parent = parent
+            # heuristic value
+            self.h = h
+            # combined cost
+            if parent:
+                self.g = g + parent.g
+            else:
+                self.g = 0
+            # evaluation function value
+            self.f = self.g + self.h
+
+        def extract_solution(self):
+            """ Gets complete path from goal state to parent node """
+            action_path = []
+            search_node = self
+            while search_node:
+                if search_node.action:
+                    action_path.append(search_node.action)
+                search_node = search_node.parent
+            return list(reversed(action_path))
+
+    def astarsearch(self, gameState):
+        # create open list
+        open = util.PriorityQueue()
+        node = make_search_node(problem.getStartState())
+        open.push(node, node.f)
+        closed = set()
+        best_g = {}  # maps states to numbers
+
+
+
+
+
+
 
 
 '''Agent Connected to Weka'''

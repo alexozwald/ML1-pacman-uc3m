@@ -131,7 +131,7 @@ class BustersKeyboardAgent(BustersAgent, KeyboardAgent):
     def chooseAction(self, gameState):
         return KeyboardAgent.getAction(self, gameState)
 
-from distanceCalculator import DistanceCalculator, Distancer
+from distanceCalculator import Distancer
 from game import Actions
 from game import Directions
 import random, sys
@@ -295,13 +295,64 @@ class BasicAgentAA(BustersAgent):
 ################################################################################
 '''Agent Made in Tutorial1'''
 class Tutorial1(BustersAgent):
+
     def registerInitialState(self, gameState):
         BustersAgent.registerInitialState(self, gameState)
         self.distancer = Distancer(gameState.data.layout, False)
-        print(self.distancer.getDistance(gameState.getPacmanPosition(),gameState.getGhostPositions()[1]))
-
         self.countActions = 0
         
+    ''' Example of counting something'''
+    def countFood(self, gameState):
+        food = 0
+        for width in gameState.data.food:
+            for height in width:
+                if(height == True):
+                    food = food + 1
+        return food
+    
+    ''' Print the layout'''  
+    def printGrid(self, gameState):
+        table = ""
+        #print(gameState.data.layout) ## Print by terminal
+        for x in range(gameState.data.layout.width):
+            for y in range(gameState.data.layout.height):
+                food, walls = gameState.data.food, gameState.data.layout.walls
+                table = table + gameState.data._foodWallStr(food[x][y], walls[x][y]) + ","
+        table = table[:-1]
+        return table
+
+    def printInfo(self, gameState):
+        print("---------------- TICK ", self.countActions, " --------------------------")
+        # Map size
+        width, height = gameState.data.layout.width, gameState.data.layout.height
+        print("Width: ", width, " Height: ", height)
+        # Pacman position
+        print("Pacman position: ", gameState.getPacmanPosition())
+        # Legal actions for Pacman in current position
+        print("Legal actions: ", gameState.getLegalPacmanActions())
+        # Pacman direction
+        print("Pacman direction: ", gameState.data.agentStates[0].getDirection())
+        # Number of ghosts
+        print("Number of ghosts: ", gameState.getNumAgents() - 1)
+        # Alive ghosts (index 0 corresponds to Pacman and is always false)
+        print("Living ghosts: ", gameState.getLivingGhosts())
+        # Ghosts positions
+        print("Ghosts positions: ", gameState.getGhostPositions())
+        # Ghosts directions
+        print("Ghosts directions: ", [gameState.getGhostDirections().get(i) for i in range(0, gameState.getNumAgents() - 1)])
+        # Manhattan distance to ghosts
+        print("Ghosts distances: ", gameState.data.ghostDistances)
+        # Pending pac dots
+        print("Pac dots: ", gameState.getNumFood())
+        # Manhattan distance to the closest pac dot
+        print("Distance nearest pac dots: ", gameState.getDistanceNearestFood())
+        # Map walls
+        print("Map:")
+        print( gameState.getWalls())
+        # Score
+        print("Score: ", gameState.getScore())
+
+
     def chooseAction(self, gameState):
         self.countActions = self.countActions + 1
         #self.printInfo(gameState)
@@ -356,7 +407,7 @@ class Tutorial1(BustersAgent):
         while move == Directions.STOP:
             move = legal[randint(0,len(legal)-1)]            
 
-        # limitation -> it dsnt have a backup plan if theres a corner or >1 wall
+        # limitation -> it dsnt have a backup plan if theres a wall in the way lmao
 
         """ORIGINAL CODE
         move_random = random.randint(0, 3)
@@ -375,36 +426,23 @@ class Tutorial1(BustersAgent):
 
 
 '''Agent Connected to Weka'''
-class WekaAgent(object):
+class WekaAgent(BustersAgent):
+    # child class __init__ override to include starting Weka.
     def __init__( self, index = 0, inference = "ExactInference", ghostAgents = None, observeEnable = True, elapseTimeEnable = True):
         inferenceType = util.lookup(inference, globals())
         self.inferenceModules = [inferenceType(a) for a in ghostAgents]
         self.observeEnable = observeEnable
         self.elapseTimeEnable = elapseTimeEnable
+
         self.weka = Weka()
         self.weka.start_jvm()
 
-    def registerInitialState(self, gameState):
-        "Initializes beliefs and inference modules"
-        import __main__
-        self.display = __main__._display
-        for inference in self.inferenceModules:
-            inference.initialize(gameState)
-        self.ghostBeliefs = [inf.getBeliefDistribution() for inf in self.inferenceModules]
-        self.firstMove = True
-
-    def observationFunction(self, gameState):
-        "Removes the ghost states from the gameState"
-        agents = gameState.data.agentStates
-        gameState.data.agentStates = [agents[0]] + [None for i in range(1, len(agents))]
-        return gameState
-
     def getAction(self, gameState):
         lineData = globalPrintLineData(gameState)
-        curr_model = "./models/training_keyboard/J48-training.model"
-        curr_data = "./data-collected/training_keyboard.arff"
-        #curr_model = "./models/training_tutorial1/J48-training.model"
-        #curr_data = "./data-collected/training_tutorial1.arff"
+        #lineData = ','.join([str(x) for x in globalPrintLineData(gameState)])
+
+        curr_model = "./models/j48-training-tutorial1+.model"
+        curr_data = "./data-collected/training_tutorial1+.arff"
         move = self.weka.predict(curr_model, lineData, curr_data)
         #move = Directions.STOP
 
@@ -417,13 +455,13 @@ class WekaAgent(object):
             move = legal[randint(0,len(legal)-1)]
             print(f"random: {move}")
         else:
+            #move = legal[randint(0,len(legal)-1)]
             print(f"Using legal Weka prediction!\tweka: {move}")
 
         return move
 
     def printLineData(self, gameState):
         return globalPrintLineData(gameState)
-
 
 ################################################################################
 #      MAKE GLOBAL printLineData() => CONSISTENCY & LESS COPY-PASTED CODE      #
@@ -444,49 +482,111 @@ def globalPrintLineData(gameState, *, useOld=False):
         current_score = f"{0}"
 
     # pacman position
-    pacman_pos = f"{gameState.getPacmanPosition()[0]},{gameState.getPacmanPosition()[1]}"
+    pacman_x = gameState.getPacmanPosition()[0]
+    pacman_y = gameState.getPacmanPosition()[1]
+    pacman_pos = (pacman_x, pacman_y)
 
-    # use manhattan distances list to check if ghost is dead -> put in 
-    # current coordinates or 'None' if it's dead.
-    ghost_dists_test = gameState.data.ghostDistances
+    # For each ghost show the manhattan distance + optimal direction to go.
+    # Or return 0 & "NULL" if ghost is dead. ghostDistances list used to check state
+    ghost_dists_test = gameState.data.ghostDistances  # is it dead?
+    # ghost 0
     if (type(ghost_dists_test[0]) == int):
-             ghost0_pos = f"{gameState.getGhostPositions()[0][0]},{gameState.getGhostPositions()[0][1]}"
-    else:    ghost0_pos = f"{-1},{-1}"
+        ghost0_dist = ghost_dists_test[0]
+        ghost0_posi = (gameState.getGhostPositions()[0][0], gameState.getGhostPositions()[0][1])
+        ghost0_dire = getBestDirection(pacman_pos, ghost0_posi)
+    else:
+        ghost0_dist = -1
+        ghost0_dire = 'NULL'
+
+    # ghost 1
     if (type(ghost_dists_test[1]) == int):
-             ghost1_pos = f"{gameState.getGhostPositions()[1][0]},{gameState.getGhostPositions()[1][1]}"
-    else:    ghost1_pos = f"{-1},{-1}"
+        ghost1_dist = ghost_dists_test[1]
+        ghost1_posi = (gameState.getGhostPositions()[1][0], gameState.getGhostPositions()[1][1])
+        ghost1_dire = getBestDirection(pacman_pos, ghost1_posi)
+    else:
+        ghost1_dist = -1
+        ghost1_dire = 'NULL'
+
+    # ghost 2
     if (type(ghost_dists_test[2]) == int):
-             ghost2_pos = f"{gameState.getGhostPositions()[2][0]},{gameState.getGhostPositions()[2][1]}"
-    else:    ghost2_pos = f"{-1},{-1}"
+        ghost2_dist = ghost_dists_test[2]
+        ghost2_posi = (gameState.getGhostPositions()[2][0], gameState.getGhostPositions()[2][1])
+        ghost2_dire = getBestDirection(pacman_pos, ghost2_posi)
+    else:
+        ghost2_dist = -1
+        ghost2_dire = 'NULL'
+
+    # ghost 3
     if (type(ghost_dists_test[3]) == int):
-             ghost3_pos = f"{gameState.getGhostPositions()[3][0]},{gameState.getGhostPositions()[3][1]}"
-    else:    ghost3_pos = f"{-1},{-1}"
+        ghost3_dist = ghost_dists_test[3]
+        ghost3_posi = (gameState.getGhostPositions()[3][0], gameState.getGhostPositions()[3][1])
+        ghost3_dire = getBestDirection(pacman_pos, ghost3_posi)
+    else:
+        ghost3_dist = -1
+        ghost3_dire = 'NULL'
+
+    # readability -> comebine ghost dist & optimal direction to compound lists
+    ghost0_data = [ghost0_dist, ghost0_dire]
+    ghost1_data = [ghost1_dist, ghost1_dire]
+    ghost2_data = [ghost2_dist, ghost2_dire]
+    ghost3_data = [ghost3_dist, ghost3_dire]
+    ghost_data = ghost0_data + ghost1_data + ghost2_data + ghost3_data
 
     # wall test / legal moves
-    #ORDER = ['North', 'South', 'East', 'West', 'Stop']
-    ORDER = [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST, Directions.STOP]
-    legal_actions = gameState.getLegalActions()
-    actions_list = []
-    # binary boolean
-    for x in ORDER:
-        if x in legal_actions:
-            actions_list.append("1")
+    ORDER = ['North', 'South', 'East', 'West', 'Stop']
+    legal_moves = []  # binary boolean
+    for x in gameState.getLegalActions():
+        if x in ORDER:
+            legal_moves.append(1)
         else:
-            actions_list.append("0")
-    legal_moves = ','.join(actions_list)
+            legal_moves.append(0)
 
     # get food & capsule stats
-    food = f"{gameState.getNumFood()}"
-    capsules = f"{len(gameState.getCapsules())}"
+    food = gameState.getNumFood()
+    capsules = len(gameState.getCapsules())
 
     # prev action
-    prev_action = f"{gameState.getPacmanState().getDirection()}"
+    prev_action = gameState.getPacmanState().getDirection()
 
     # compile shortened statistic variables to one string to be appended to csv
-    if not useOld:
-        state = f"{future_score},{current_score},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos},{legal_moves},{prev_action}"
-    else:
-        state = f"{future_score},{current_score},{food},{capsules},{pacman_pos},{ghost0_pos},{ghost1_pos},{ghost2_pos},{ghost3_pos},{prev_action}"
-    # LAST listed attribute is the 
+    # NOTE: LAST listed attribute is the previous action.
+    state = [future_score,current_score,food,capsules] + ghost_data + [prev_action]
+
+    """
+    @relation training_tutorial1+
+
+    @attribute future_score numeric
+    @attribute current_score numeric
+    @attribute food numeric
+    @attribute capsules numeric
+    @attribute ghost0_dist numeric
+    @attribute ghost0_dire {NULL,West,East,North,South}
+    @attribute ghost1_dist numeric
+    @attribute ghost1_dire {NULL,West,East,North,South}
+    @attribute ghost2_dist numeric
+    @attribute ghost2_dire {NULL,West,East,North,South}
+    @attribute ghost3_dist numeric
+    @attribute ghost3_dire {NULL,West,East,North,South}
+    @attribute prev_action {Stop,West,East,North,South}
+
+    @data
+    """
 
     return state
+
+
+# Determines the simplistic optimal cardinal direction to head in to reach a ghost
+def getBestDirection(pacman_pos: tuple, ghost_posi: tuple) -> str:
+    x_diff = ghost_posi[0] - pacman_pos[0]
+    y_diff = ghost_posi[1] - pacman_pos[1]
+
+    if (abs(x_diff) > abs(y_diff)):
+        if x_diff >= 0:
+            return "East"
+        else:
+            return "West"
+    else:
+        if y_diff >= 0:
+            return "North"
+        else:
+            return "South"

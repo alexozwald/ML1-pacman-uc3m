@@ -60,3 +60,21 @@ py busters.py -p Tutorial1 -g RandomGhost -l minimaxClassic
 py busters.py -p Tutorial1 -g RandomGhost -l contestClassic
 py busters.py -p Tutorial1 -g RandomGhost -l capsuleClassic
 py busters.py -p Tutorial1 -g RandomGhost -l 20Hunt
+
+
+# THE SECOND TRY
+
+## training_tutorial1+.arff
+py busters.py -p Tutorial1 -g RandomGhost
+py busters.py -p Tutorial1 -g RandomGhost -l openClassic
+py busters.py -p Tutorial1 -g RandomGhost -l smallClassic
+py busters.py -p Tutorial1 -g RandomGhost -l smallHunt
+py busters.py -p Tutorial1 -g RandomGhost -l bigHunt
+py busters.py -p Tutorial1 -l smallHunt
+py busters.py -p Tutorial1 -l openClassic
+py busters.py -p Tutorial1 -l smallClassic
+py busters.py -p Tutorial1 -l smallHunt
+py busters.py -p Tutorial1 -l bigHunt
+
+## used to generate...
+## ./models/training_keyboard/J48-training+.model

@@ -1,32 +1,6 @@
-from __future__ import print_function
-from __future__ import division
 # game.py
 # -------
-# Licensing Information:  You are free to use or extend these projects for
-# educational purposes provided that (1) you do not distribute or publish
-# solutions, (2) you retain this notice, and (3) you provide clear
-# attribution to UC Berkeley.
-# 
-# Attribution Information: The Pacman AI projects were developed at UC Berkeley.
-# The core projects and autograders were primarily created by John DeNero
-# (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
-# Student side autograding was added by Brad Miller, Nick Hay, and
-# Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
-
-# game.py
-# -------
-# Licensing Information: Please do not distribute or publish solutions to this
-# project. You are free to use and extend these projects for educational
-# purposes. The Pacman AI projects were developed at UC Berkeley, primarily by
-# John DeNero (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
-
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import range
-from past.utils import old_div
-from builtins import object
 from util import *
 import time, os
 import traceback
@@ -36,7 +10,7 @@ import sys
 # Parts worth reading #
 #######################
 
-class Agent(object):
+class Agent:
     """
     An agent must define a getAction method, but may also define the
     following methods which will be called if they exist:
@@ -53,7 +27,7 @@ class Agent(object):
         """
         raiseNotDefined()
 
-class Directions(object):
+class Directions:
     NORTH = 'North'
     SOUTH = 'South'
     EAST = 'East'
@@ -74,7 +48,7 @@ class Directions(object):
                WEST: EAST,
                STOP: STOP}
 
-class Configuration(object):
+class Configuration:
     """
     A Configuration holds the (x,y) coordinate of a character, along with its
     traveling direction.
@@ -124,7 +98,7 @@ class Configuration(object):
             direction = self.direction # There is no stop direction
         return Configuration((x + dx, y+dy), direction)
 
-class AgentState(object):
+class AgentState:
     """
     AgentStates hold the state of an agent (configuration, speed, scared, etc).
     """
@@ -135,7 +109,6 @@ class AgentState(object):
         self.isPacman = isPacman
         self.scaredTimer = 0
         self.numCarrying = 0
-        self.numReturned = 0
 
     def __str__( self ):
         if self.isPacman:
@@ -156,7 +129,6 @@ class AgentState(object):
         state.configuration = self.configuration
         state.scaredTimer = self.scaredTimer
         state.numCarrying = self.numCarrying
-        state.numReturned = self.numReturned
         return state
 
     def getPosition(self):
@@ -166,7 +138,7 @@ class AgentState(object):
     def getDirection(self):
         return self.configuration.getDirection()
 
-class Grid(object):
+class Grid:
     """
     A 2-dimensional array of objects backed by a list of lists.  Data is accessed
     via grid[x][y] where (x,y) are positions on a Pacman map with x horizontal,
@@ -253,7 +225,7 @@ class Grid(object):
         return tuple(bits)
 
     def _cellIndexToPosition(self, index):
-        x = old_div(index, self.height)
+        x = index / self.height
         y = index % self.height
         return x, y
 
@@ -291,7 +263,7 @@ def reconstituteGrid(bitRep):
 # Parts you shouldn't have to read #
 ####################################
 
-class Actions(object):
+class Actions:
     """
     A collection of static methods for manipulating move actions.
     """
@@ -375,7 +347,7 @@ class Actions(object):
         return (x + dx, y + dy)
     getSuccessor = staticmethod(getSuccessor)
 
-class GameStateData(object):
+class GameStateData:
     """
 
     """
@@ -496,7 +468,6 @@ class GameStateData(object):
         Creates an initial game state from a layout array (see layout.py).
         """
         self.food = layout.food.copy()
-        #self.capsules = []
         self.capsules = layout.capsules[:]
         self.layout = layout
         self.score = 0
@@ -517,7 +488,7 @@ try:
 except:
     _BOINC_ENABLED = False
 
-class Game(object):
+class Game:
     """
     The Game manages the control flow, soliciting actions from agents.
     """
@@ -570,6 +541,7 @@ class Game(object):
         sys.stdout = OLD_STDOUT
         sys.stderr = OLD_STDERR
 
+
     def run( self ):
         """
         Main control loop for game play.
@@ -589,7 +561,6 @@ class Game(object):
                 self.unmute()
                 self._agentCrash(i, quiet=True)
                 return
-
             if ("registerInitialState" in dir(agent)):
                 self.mute(i)
                 if self.catchExceptions:
@@ -617,22 +588,12 @@ class Game(object):
 
         agentIndex = self.startingIndex
         numAgents = len( self.agents )
-        step = 0
-
-        # ADDED BY ALEX TO PRINT DATA
-        # check if file exists before writing header
-        ExistingFile = os.path.isfile("ex.csv") 
-        if not ExistingFile:
-            with open("_ex.csv","a") as f:
-                f.write("future_score,current_score,food,capsules,ghost0_dist,ghost0_dire,ghost1_dist,ghost1_dire,ghost2_dist,ghost2_dire,ghost3_dist,ghost3_dire,prev_action\n")
-
 
         while not self.gameOver:
             # Fetch the next agent
             agent = self.agents[agentIndex]
             move_time = 0
             skip_action = False
-                
             # Generate an observation of the state
             if 'observationFunction' in dir( agent ):
                 self.mute(agentIndex)
@@ -656,16 +617,8 @@ class Game(object):
             else:
                 observation = self.state.deepCopy()
 
-
-            # IF AGENT IS PACMAN
-            if agentIndex == 0:
-                with open('_ex.csv','a') as f:
-                    f.write( f"{','.join([str(x) for x in agent.printLineData(observation)])}\n")
-
-
             # Solicit an action
             action = None
-            step += 1
             self.mute(agentIndex)
             if self.catchExceptions:
                 try:
