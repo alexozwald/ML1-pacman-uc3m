@@ -2,6 +2,7 @@
 # ----------------
 # custom added by Alex Oswald to save space
 
+import enum
 from bustersAgents import BustersAgent
 from game import Directions, Actions
 from distanceCalculator import Distancer
@@ -38,14 +39,14 @@ class QLearningAgent(BustersAgent):
         self.distancer = Distancer(gameState.data.layout, False)
 
 
-        self.epsilon = 0.1
+        self.epsilon = 0.125
         self.alpha = 0.9
         self.discount = 0.8
         
         self.actions = {"North":0, "East":1, "South":2, "West":3}
 
         # check layout height / how many rows there should be
-        req_height = gameState.data.layout.height
+        req_height = gameState.data.layout.height+1
 
         if os.path.exists("qtable.txt"):
             self.table_file = open("qtable.txt", "r+")
@@ -120,15 +121,13 @@ class QLearningAgent(BustersAgent):
 
         optimal_dir = self.bfs(state, walls, xy_pacmn, xy_ghost)
         if optimal_dir == Directions.NORTH:
-            row = state.data.layout.height-2
+            row = xy_pacmn[1]+1
         elif optimal_dir == Directions.SOUTH:
-            row = state.data.layout.height
+            row = xy_pacmn[1]-1
         else:
-            row = state.data.layout.height-1
+            row = xy_pacmn[1]
 
         return row
-
-        util.raiseNotDefined()
 
 
     def getQValue(self, state, action):
@@ -245,7 +244,7 @@ class QLearningAgent(BustersAgent):
         "Return the obtained reward"
         
         "*** YOUR CODE HERE ***"
-        r = 1
+        r = 0
 
         # terminal state: munch on ghost
         # next pacman location
@@ -255,7 +254,7 @@ class QLearningAgent(BustersAgent):
 
         # +update state: eat dot food
         if state.hasFood(xy_pacman[0],xy_pacman[1]):
-            r += 0.5
+            r += 1
 
         # if dist increases or decreases...  (to closest ghost)
         min_dist_og = sys.maxsize
@@ -265,24 +264,32 @@ class QLearningAgent(BustersAgent):
         for i in [x for x in nextstate.data.ghostDistances if type(x)==int]:
             if i < min_dist_next:   min_dist_next = i
         
-        if (min_dist_next-min_dist_og) > 0:
-            r -= 0.25
-        if (min_dist_next-min_dist_og) < 0:
-            r += 0.25
+        #if (min_dist_next-min_dist_og) > 0:
+        #    r -= 0.25
+        #if (min_dist_next-min_dist_og) < 0:
+        #    r += 0.25
 
-        # check bfs
+        # USING BFS
         w = state.getWalls()
         p = state.getPacmanPosition()
-        g = state.getGhostPositions()[state.data.ghostDistances.index(min_dist_og)]
-        optimal_dir = self.bfs(state, w, p, g)
-        #chosen = nextstate.getPacmanState().getDirection()
-        if action == self.actions[optimal_dir]:
-            r += 0.75
+
+        # find food OR ghost
+        f_map = state.getFood()
+        if self.foodLeft(f_map):
+            optimal_dir = self.bfs(state, w, p, self.nearestFood(p, f_map))
+            r += 0.3
         else:
-            r -= 0.25
+            g = state.getGhostPositions()[state.data.ghostDistances.index(min_dist_og)]
+            optimal_dir = self.bfs(state, w, p, g)        
 
+        # implement directed destination to food or ghost
+        if action == optimal_dir:
+            r += 0.6
+        else:
+            r -= 0.9
+
+        print(f"reward: {r}  &&  dir={action}, optimal={optimal_dir}")
         return r
-
 
         # -update state: moved farther from closest ghost. (by 1 or by 2 is even worse)
 
@@ -294,10 +301,38 @@ class QLearningAgent(BustersAgent):
     #######################
     # CUSTOM MEMBER FUNCS #
     #######################
-    def bfs(self, state, walls, pacman, ghost):
+    def foodLeft(self, f_map) -> bool:
+        for i in f_map:
+            for j in i:
+                if j:
+                    return True
+        return False
+
+    def nearestFood(self, pman, f_map):
+        full_list = []
+        for i_,j in enumerate(f_map):
+            for j_,j in enumerate(f_map[i_]):
+                if j:
+                    full_list.append((i_,j_))
+
+        min_dist = sys.maxsize
+        closest = None
+        for idx,coord in enumerate(full_list):
+            x_delta = abs(pman[0] - coord[0])
+            y_delta = abs(pman[1] - coord[1])
+            dist = x_delta + y_delta
+            if dist < min_dist:
+                min_dist = dist
+                closest = coord
+
+        return coord
+
+
+
+    def bfs(self, state, walls, pacman, target):
         # setup
         pacman = tuple(pacman)
-        ghost = tuple(ghost)
+        target = tuple(target)
 
         visited = set()
         q = queue()
@@ -310,7 +345,7 @@ class QLearningAgent(BustersAgent):
         while not q.empty():
             curr_xy = q.pop(0)
             visited.add(curr_xy)
-            if curr_xy == ghost:
+            if curr_xy == target:
                 path_found = True
                 break
 

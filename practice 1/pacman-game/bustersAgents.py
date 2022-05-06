@@ -293,8 +293,19 @@ class BasicAgentAA(BustersAgent):
 ################################################################################
 #                                  OUR AGENTS                                  #
 ################################################################################
+# tiny class addendum for aesthetic purposes
+class queue(list):
+    def empty(self):
+        if len(self) == 0:
+            return True
+        else:
+            return False
+
+    def push(self, __object) -> None:
+        return super().append(__object)
+
 '''Agent Made in Tutorial1'''
-class Tutorial1(BustersAgent):
+class Tutorial1_yay(BustersAgent):
 
     def registerInitialState(self, gameState):
         BustersAgent.registerInitialState(self, gameState)
@@ -355,74 +366,83 @@ class Tutorial1(BustersAgent):
 
     def chooseAction(self, gameState):
         self.countActions = self.countActions + 1
-        #self.printInfo(gameState)
-        move = Directions.STOP
-        legal = gameState.getLegalActions(0) ##Legal position from the pacman
 
-        # find closest ghost (with index) using manhattan data
-        man_dists = gameState.data.ghostDistances
-        # find min from list (cant use min() if one ghost is already dead and it
-        # becomes None-Type instead of a tuple).  also keep track of distances.
-        closest_ghost = 100
+        # walls + pacman
+        w = gameState.getWalls()
+        p = gameState.getPacmanPosition()
 
-        if ((type(man_dists[0]) == int) and (man_dists[0] < closest_ghost)):
-            closest_ghost = man_dists[0]
-            idx_gho = man_dists.index(closest_ghost)
-        if ((type(man_dists[1]) == int) and (man_dists[1] < closest_ghost)):
-            closest_ghost = man_dists[1]
-            idx_gho = man_dists.index(closest_ghost)
-        if ((type(man_dists[2]) == int) and (man_dists[2] < closest_ghost)):
-            closest_ghost = man_dists[2]
-            idx_gho = man_dists.index(closest_ghost)
-        if ((type(man_dists[3]) == int) and (man_dists[3] < closest_ghost)):
-            closest_ghost = man_dists[3]
-            idx_gho = man_dists.index(closest_ghost)
-        if closest_ghost == 100:
-            print("Error finding closest ghost -> no living ghosts")
-            move = Directions.STOP
-            return move
+        # closest ghost
+        min_dist = sys.maxsize
+        for i in [x for x in gameState.data.ghostDistances if type(x)==int]:
+            if i < min_dist:   min_dist = i
+        g = gameState.getGhostPositions()[gameState.data.ghostDistances.index(min_dist)]
 
-        # get locations of pacman + closest ghost
-        loc_pac = list(gameState.getPacmanPosition())
-        loc_gho = list(gameState.getGhostPositions()[idx_gho])
+        # find best direction
+        move = self.bfs(gameState, w, p, g)
 
-        # find closest dimension
-        x_diff = loc_gho[0] - loc_pac[0]
-        y_diff = loc_gho[1] - loc_pac[1]
-
-        # MOVE OPPOSITE OF WHATS CLOSER
-        # for moving E-W; y_diff is smaller
-        if (abs(x_diff) > abs(y_diff)):
-            if (x_diff <  0) and Directions.WEST in legal:  move = Directions.WEST
-            if (x_diff >  0) and Directions.EAST in legal:  move = Directions.EAST
-            # if x_diff == 0 there is no match and move to else-case...
-        # for moving N-S; x_diff is smaller or they're equal
-        elif (abs(x_diff) <= abs(y_diff)):
-            if (y_diff <  0) and Directions.SOUTH in legal: move = Directions.SOUTH
-            if (y_diff >  0) and Directions.NORTH in legal: move = Directions.NORTH
-            if (x_diff == 0) and (y_diff == 0):             move = Directions.STOP
-        else:
-            move = Directions.STOP
-
-        while move == Directions.STOP:
-            move = legal[randint(0,len(legal)-1)]            
-
-        # limitation -> it dsnt have a backup plan if theres a wall in the way lmao
-
-        """ORIGINAL CODE
-        move_random = random.randint(0, 3)
-        if   ( move_random == 0 ) and Directions.WEST in legal:  move = Directions.WEST
-        if   ( move_random == 1 ) and Directions.EAST in legal: move = Directions.EAST
-        if   ( move_random == 2 ) and Directions.NORTH in legal:   move = Directions.NORTH
-        if   ( move_random == 3 ) and Directions.SOUTH in legal: move = Directions.SOUTH
-        """
         return move
 
     def printLineData(self, gameState):
         return globalPrintLineData(gameState)
 
-    def manhattan(self, p1, p2):
-        return sum(abs(v1-v2) for v1, v2 in zip(p1,p2))
+    def bfs(self, state, walls, pacman, target):
+        # setup
+        pacman = tuple(pacman)
+        target = tuple(target)
+
+        visited = set()
+        q = queue()
+        q.push(pacman)
+        parent = dict()
+        parent[pacman] = None
+
+        # scan graph via bfs
+        path_found = False
+        while not q.empty():
+            curr_xy = q.pop(0)
+            visited.add(curr_xy)
+            if curr_xy == target:
+                path_found = True
+                break
+
+            list_to_try = self.getMovesHypoth(walls, curr_xy)
+            random.shuffle(list_to_try)
+            for next_xy in list_to_try:
+                if next_xy not in visited:
+                    q.append(next_xy)
+                    parent[next_xy] = curr_xy
+                    visited.add(next_xy)
+
+        # reconstruct path
+        path = queue()
+        if path_found:
+            path.push(curr_xy)
+            while parent[curr_xy] is not pacman:
+                path.push(parent[curr_xy])
+                curr_xy = parent[curr_xy]
+            path.reverse()
+
+        # figure correct direction from next move.
+        # *reversed expectations bc matching next move to pacman (prev move)*
+        nexT = path[0]
+        if (nexT[0],nexT[1]-1) == pacman:   return Directions.NORTH
+        if (nexT[0],nexT[1]+1) == pacman:   return Directions.SOUTH
+        if (nexT[0]+1,nexT[1]) == pacman:   return Directions.WEST
+        if (nexT[0]-1,nexT[1]) == pacman:   return Directions.EAST
+
+    def getMovesHypoth(self, walls, pman):
+        x = pman[0]
+        y = pman[1]
+        legal = []
+
+        # if north wall is true...
+        if not walls[x][y+1]:   legal.append((x,y+1))  # append north location
+        if not walls[x][y-1]:   legal.append((x,y-1))
+        if not walls[x-1][y]:   legal.append((x-1,y))
+        if not walls[x+1][y]:   legal.append((x+1,y))
+
+        return legal
+
 
 
 '''Agent Connected to Weka'''
