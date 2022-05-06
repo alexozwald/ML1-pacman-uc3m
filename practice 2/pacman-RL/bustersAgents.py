@@ -22,7 +22,6 @@ from keyboardAgents import KeyboardAgent
 import inference
 import busters
 import numpy as np
-import os.path
 
 class NullGraphics(object):
     "Placeholder for graphics"

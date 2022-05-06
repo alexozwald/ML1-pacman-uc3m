@@ -16,7 +16,7 @@ class QLearningAgent(BustersAgent):
     def __init__(self, index=0, inference="ExactInference", ghostAgents=None, observeEnable=True, elapseTimeEnable=True):
         super().__init__(index, inference, ghostAgents, observeEnable, elapseTimeEnable)
 
-        print("yay we're __init__'ing!!!")
+        #print("yay we're __init__'ing!!!")
 
     #Initialization
     def registerInitialState(self, gameState):
