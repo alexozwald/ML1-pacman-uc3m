@@ -3,10 +3,24 @@
 # custom added by Alex Oswald to save space
 
 from bustersAgents import BustersAgent
+from game import Directions, Actions
+from distanceCalculator import Distancer
 import util
-from game import Directions
+import sys
+import random
 import numpy as np
 import os.path
+
+# random addendum
+class queue(list):
+    def empty(self):
+        if len(self) == 0:
+            return True
+        else:
+            return False
+
+    def push(self, __object) -> None:
+        return super().append(__object)
 
 #############################
 # Assignment 2 Target Class #
@@ -22,13 +36,21 @@ class QLearningAgent(BustersAgent):
     def registerInitialState(self, gameState):
         BustersAgent.registerInitialState(self, gameState)
         self.distancer = Distancer(gameState.data.layout, False)
+
+
         self.epsilon = 0.0
         self.alpha = 0.5
         self.discount = 0.8
+        #self.history = [] # (Direction.XXXX, int)
+        #if self.history[-1][1] == "broke bitch":
+        #    do something else
+        #self.history.append((curr_move, int))
+        
         self.actions = {"North":0, "East":1, "South":2, "West":3}
         if os.path.exists("qtable.txt"):
             self.table_file = open("qtable.txt", "r+")
             self.q_table = self.readQtable()
+            print(self.q_table)
         else:
             self.table_file = open("qtable.txt", "w+")
             #"*** CHECK: NUMBER OF ROWS IN QTABLE DEPENDS ON THE NUMBER OF STATES ***"
@@ -73,7 +95,7 @@ class QLearningAgent(BustersAgent):
         self.writeQtable()
         self.table_file.close()
 
-   
+
     def computePosition(self, state):
         """
         Compute the row of the qtable for a given state.
@@ -81,7 +103,23 @@ class QLearningAgent(BustersAgent):
         
         "*** YOUR CODE HERE ***"
 
-        values = [self.getQValue(state, action) for action in state.getLegalActions(state)]
+        # closest ghost
+        min_dist = sys.maxsize
+        for i in [x for x in state.data.ghostDistances if not None]:
+            if i < min_dist:   min_dist = i
+        min_g_idx = state.data.ghostDistances.index(min_dist)
+
+        # 
+        wall_matrix = state.getWalls()
+
+        x_ghost = state.ghostPositions()[min_g_idx][0]
+        y_ghost = state.ghostPositions()[min_g_idx][1]
+        x_pacmn = state.getPacmanPosition()[0]
+        y_pacmn = state.getPacmanPosition()[1]
+
+        ##xyx
+
+        values = [self.getQValue(state, action) for action in state.getLegalActions(state) if action != Directions.STOP]
 
         util.raiseNotDefined()
 
@@ -151,7 +189,7 @@ class QLearningAgent(BustersAgent):
         action = None
 
         if len(legalActions) == 0:
-                return action
+            return action
 
         flip = util.flipCoin(self.epsilon)
 
@@ -172,8 +210,11 @@ class QLearningAgent(BustersAgent):
         Q(state,action) <- (1-self.alpha) Q(state,action) + self.alpha * (r + 0)
         else:
         Q(state,action) <- (1-self.alpha) Q(state,action) + self.alpha * (r + self.discount * max a' Q(nextState, a'))
-        
         """
+
+        newQValue = (1 - self.alpha) * self.getQValue(state, action) #new Qvalue
+        newQValue += self.alpha * (reward + (self.discount * self.getValue(nextState)))
+        self.q_table[state, action] = newQValue
 
         "*** YOUR CODE HERE ***"        
         util.raiseNotDefined()
@@ -210,3 +251,58 @@ class QLearningAgent(BustersAgent):
                 return "North"
             else:
                 return "South"
+
+    def bfs(self, state, walls, pacman, ghost):
+        # setup
+        visited = set()
+        q = queue()
+        q.push(pacman)
+        parent = dict()
+        parent[pacman] = None
+
+        # scan graph in bfs
+        path_found = False
+        while not q.empty():
+            curr_xy = q.pop(0)
+            visited.add(curr_xy)
+
+            if curr_xy == ghost:
+                path_found = True
+                break
+
+            for next_xy in self.getMovesHypoth(walls, curr_xy):
+                if next_xy not in visited:
+                    q.append(next_xy)
+                    parent[next_xy] = curr_xy
+                    visited.add(next_xy)
+
+        # reconstruct path
+        path = queue()
+        if path_found:
+            path.push(curr_xy)
+            while parent[curr_xy] is not pacman:
+                path.push(parent[curr_xy])
+                curr_xy = parent[curr_xy]
+
+            path.reverse()
+            print(f"shortest path ({len(path)} moves) = {'->'.join([pacman] + path)}.")
+
+        # figure correct direction from next move.
+        nexT = path[0]
+        if [nexT[0],nexT[1]+1] == pacman:   return Directions.NORTH
+        if [nexT[0],nexT[1]-1] == pacman:   return Directions.SOUTH
+        if [nexT[0]-1,nexT[1]] == pacman:   return Directions.WEST
+        if [nexT[0]+1,nexT[1]] == pacman:   return Directions.EAST
+
+    def getMovesHypoth(self, walls: list, pman: list):
+        x = pman[0]
+        y = pman[1]
+        legal = []
+
+        # if north wall is true...
+        if not walls[x][y+1]:   legal.append([x,y+1])
+        if not walls[x][y-1]:   legal.append([x,y-1])
+        if not walls[x-1][y]:   legal.append([x-1,y])
+        if not walls[x+1][y]:   legal.append([x+1,y])
+
+        return legal
