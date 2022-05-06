@@ -79,18 +79,10 @@ class Tutorial1_Improved(BustersAgent):
         # becomes None-Type instead of a tuple).  also keep track of distances.
         closest_ghost = 100
 
-        if ((type(man_dists[0]) == int) and (man_dists[0] < closest_ghost)):
-            closest_ghost = man_dists[0]
-            idx_gho = man_dists.index(closest_ghost)
-        if ((type(man_dists[1]) == int) and (man_dists[1] < closest_ghost)):
-            closest_ghost = man_dists[1]
-            idx_gho = man_dists.index(closest_ghost)
-        if ((type(man_dists[2]) == int) and (man_dists[2] < closest_ghost)):
-            closest_ghost = man_dists[2]
-            idx_gho = man_dists.index(closest_ghost)
-        if ((type(man_dists[3]) == int) and (man_dists[3] < closest_ghost)):
-            closest_ghost = man_dists[3]
-            idx_gho = man_dists.index(closest_ghost)
+        for i in range(len(man_dists)):
+            if ((type(man_dists[i]) == int) and (man_dists[i] < closest_ghost)):
+                closest_ghost = man_dists[i]
+                idx_gho = man_dists.index(closest_ghost)
         if closest_ghost == 100:
             print("Error finding closest ghost -> no living ghosts")
             move = Directions.STOP
@@ -134,7 +126,7 @@ class Tutorial1_Improved(BustersAgent):
         walls = gameState.getWalls()
 
         move = self.bfs(gameState, walls, [loc_pac[0],loc_pac[1]], [loc_gho[0],loc_gho[1]])
-        print (f"{move} +++ {legal}")
+        #print (f"{move} +++ {legal}")
 
         return move
 
@@ -174,15 +166,15 @@ class Tutorial1_Improved(BustersAgent):
                 curr_xy = parent[curr_xy]
 
             path.reverse()
-            print(f"pacman: ({pacman[0]},{pacman[1]}) & next move ({path[0][0]},{path[0][1]})")
-            #print(f"shortest path ({len(path)} moves) = {'->'.join(list(pacman) + path)}.")
+            #print(f"pacman: ({pacman[0]},{pacman[1]}) & next move ({path[0][0]},{path[0][1]})")
 
         # figure correct direction from next move.
+        # *reversed expectations bc matching next move to pacman (prev move)*
         nexT = path[0]
-        if [nexT[0],nexT[1]-1] == list(pacman):   return Directions.NORTH
-        if [nexT[0],nexT[1]+1] == list(pacman):   return Directions.SOUTH
-        if [nexT[0]+1,nexT[1]] == list(pacman):   return Directions.WEST
-        if [nexT[0]-1,nexT[1]] == list(pacman):   return Directions.EAST
+        if (nexT[0],nexT[1]-1) == pacman:   return Directions.NORTH
+        if (nexT[0],nexT[1]+1) == pacman:   return Directions.SOUTH
+        if (nexT[0]+1,nexT[1]) == pacman:   return Directions.WEST
+        if (nexT[0]-1,nexT[1]) == pacman:   return Directions.EAST
 
     def getMovesHypoth(self, walls, pman):
         x = pman[0]
@@ -190,13 +182,12 @@ class Tutorial1_Improved(BustersAgent):
         legal = []
 
         # if north wall is true...
-        if not walls[x][y+1]:   legal.append((x,y+1))
+        if not walls[x][y+1]:   legal.append((x,y+1))  # append north location
         if not walls[x][y-1]:   legal.append((x,y-1))
         if not walls[x-1][y]:   legal.append((x-1,y))
         if not walls[x+1][y]:   legal.append((x+1,y))
 
         return legal
-
     def printLineData(self, gameState):
         return globalPrintLineData(gameState)
 
