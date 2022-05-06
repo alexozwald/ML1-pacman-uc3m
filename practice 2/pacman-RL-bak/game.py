@@ -708,8 +708,8 @@ class Game(object):
                 self.state = self.state.generateSuccessor( agentIndex, action )
 
             # For Q-learning: update Q-table
-            if agentIndex == 0:
-               agent.update(observation, action, self.state, agent.getReward(observation, action, self.state))
+            #if agentIndex == 0:
+            #    agent.update(observation, action, self.state, agent.getReward(observation, action, self.state))
                 
                 
             # Change the display
