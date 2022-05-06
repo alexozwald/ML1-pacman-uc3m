@@ -1,0 +1,16 @@
+# commands.txt
+
+# test
+py busters.py -l labAA1 -k 1
+
+# actual experimenting
+py busters.py -p QLearningAgent -l labAA1 -k 1 
+py busters.py -p QLearningAgent -l labAA1 -k 1 -n 10
+py busters.py -p QLearningAgent -l labAA2 -k 1 
+py busters.py -p QLearningAgent -l labAA2 -k 1 -n 10
+py busters.py -p QLearningAgent -l labAA3 -k 1 
+py busters.py -p QLearningAgent -l labAA3 -k 1 -n 10
+py busters.py -p QLearningAgent -l labAA4 -k 1 
+py busters.py -p QLearningAgent -l labAA4 -k 1 -n 10
+py busters.py -p QLearningAgent -l labAA5 -k 1 
+py busters.py -p QLearningAgent -l labAA5 -k 1 -n 10
