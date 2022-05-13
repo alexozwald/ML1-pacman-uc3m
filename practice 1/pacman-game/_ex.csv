@@ -630,3 +630,5 @@ future_score,current_score,food,capsules,ghost0_dist,ghost0_dire,ghost1_dist,gho
 0,0,1,0,11,West,9,West,5,South,3,North,Stop
 future_score,current_score,food,capsules,ghost0_dist,ghost0_dire,ghost1_dist,ghost1_dire,ghost2_dist,ghost2_dire,ghost3_dist,ghost3_dire,prev_action
 0,0,1,0,11,West,9,West,5,South,3,North,Stop
+future_score,current_score,food,capsules,ghost0_dist,ghost0_dire,ghost1_dist,ghost1_dire,ghost2_dist,ghost2_dire,ghost3_dist,ghost3_dire,prev_action
+0,0,1,0,11,West,9,West,5,South,3,North,Stop

@@ -419,7 +419,7 @@ class WekaAgent(BustersAgent):
         print(lineData)
         #lineData = ','.join([str(x) for x in globalPrintLineData(gameState)])
 
-        curr_model = "./newer_j48.model"
+        curr_model = "./newest_j48.model"
         curr_data = "./new_test.arff"
         move = self.weka.predict(curr_model, lineData, curr_data)
         #move = Directions.STOP
