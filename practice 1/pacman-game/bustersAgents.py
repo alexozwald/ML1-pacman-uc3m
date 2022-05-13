@@ -320,49 +320,6 @@ class Tutorial1_yay(BustersAgent):
                 if(height == True):
                     food = food + 1
         return food
-    
-    ''' Print the layout'''  
-    def printGrid(self, gameState):
-        table = ""
-        #print(gameState.data.layout) ## Print by terminal
-        for x in range(gameState.data.layout.width):
-            for y in range(gameState.data.layout.height):
-                food, walls = gameState.data.food, gameState.data.layout.walls
-                table = table + gameState.data._foodWallStr(food[x][y], walls[x][y]) + ","
-        table = table[:-1]
-        return table
-
-    def printInfo(self, gameState):
-        print("---------------- TICK ", self.countActions, " --------------------------")
-        # Map size
-        width, height = gameState.data.layout.width, gameState.data.layout.height
-        print("Width: ", width, " Height: ", height)
-        # Pacman position
-        print("Pacman position: ", gameState.getPacmanPosition())
-        # Legal actions for Pacman in current position
-        print("Legal actions: ", gameState.getLegalPacmanActions())
-        # Pacman direction
-        print("Pacman direction: ", gameState.data.agentStates[0].getDirection())
-        # Number of ghosts
-        print("Number of ghosts: ", gameState.getNumAgents() - 1)
-        # Alive ghosts (index 0 corresponds to Pacman and is always false)
-        print("Living ghosts: ", gameState.getLivingGhosts())
-        # Ghosts positions
-        print("Ghosts positions: ", gameState.getGhostPositions())
-        # Ghosts directions
-        print("Ghosts directions: ", [gameState.getGhostDirections().get(i) for i in range(0, gameState.getNumAgents() - 1)])
-        # Manhattan distance to ghosts
-        print("Ghosts distances: ", gameState.data.ghostDistances)
-        # Pending pac dots
-        print("Pac dots: ", gameState.getNumFood())
-        # Manhattan distance to the closest pac dot
-        print("Distance nearest pac dots: ", gameState.getDistanceNearestFood())
-        # Map walls
-        print("Map:")
-        print( gameState.getWalls())
-        # Score
-        print("Score: ", gameState.getScore())
-
 
     def chooseAction(self, gameState):
         self.countActions = self.countActions + 1
@@ -459,10 +416,11 @@ class WekaAgent(BustersAgent):
 
     def getAction(self, gameState):
         lineData = globalPrintLineData(gameState)
+        print(lineData)
         #lineData = ','.join([str(x) for x in globalPrintLineData(gameState)])
 
-        curr_model = "./models/j48-training-tutorial1+.model"
-        curr_data = "./data-collected/training_tutorial1+.arff"
+        curr_model = "./newer_j48.model"
+        curr_data = "./new_test.arff"
         move = self.weka.predict(curr_model, lineData, curr_data)
         #move = Directions.STOP
 
@@ -487,19 +445,19 @@ class WekaAgent(BustersAgent):
 #      MAKE GLOBAL printLineData() => CONSISTENCY & LESS COPY-PASTED CODE      #
 ################################################################################
 
-future_score = ""
-current_score = "0"
+future_score = None
+current_score = 0
 
 def globalPrintLineData(gameState, *, useOld=False):
     # game score + archive prev score
     global future_score
     global current_score
-    if (future_score != ""):
+    if (future_score != None):
         current_score = future_score
-        future_score = f"{gameState.getScore()}"
+        future_score = gameState.getScore()
     else:
-        future_score = f"{gameState.getScore()}"
-        current_score = f"{0}"
+        future_score = gameState.getScore()
+        current_score = 0
 
     # pacman position
     pacman_x = gameState.getPacmanPosition()[0]
@@ -509,48 +467,39 @@ def globalPrintLineData(gameState, *, useOld=False):
     # For each ghost show the manhattan distance + optimal direction to go.
     # Or return 0 & "NULL" if ghost is dead. ghostDistances list used to check state
     ghost_dists_test = gameState.data.ghostDistances  # is it dead?
-    # ghost 0
-    if (type(ghost_dists_test[0]) == int):
-        ghost0_dist = ghost_dists_test[0]
-        ghost0_posi = (gameState.getGhostPositions()[0][0], gameState.getGhostPositions()[0][1])
-        ghost0_dire = getBestDirection(pacman_pos, ghost0_posi)
-    else:
-        ghost0_dist = -1
-        ghost0_dire = 'NULL'
+    ghost_data = []
+    num_ghosts = gameState.getNumAgents()-1  # agent 0 is pacman
+    if num_ghosts >= 4:
+        num_ghosts = 4
+    if num_ghosts > 0:
+        for g in range(0, num_ghosts):
+            ghostX_data = [None] * 2
 
-    # ghost 1
-    if (type(ghost_dists_test[1]) == int):
-        ghost1_dist = ghost_dists_test[1]
-        ghost1_posi = (gameState.getGhostPositions()[1][0], gameState.getGhostPositions()[1][1])
-        ghost1_dire = getBestDirection(pacman_pos, ghost1_posi)
-    else:
-        ghost1_dist = -1
-        ghost1_dire = 'NULL'
+            if type(ghost_dists_test[g]) == int:
+                ghostX_data[0] = ghost_dists_test[g]
+                ghostX_posi = (gameState.getGhostPositions()[g][0], gameState.getGhostPositions()[g][1])
+                ghostX_data[1] = getBestDirection(pacman_pos, ghostX_posi, g)
+            else:
+                ghostX_data[0] = 500
+                ghostX_data[1] = 'NULL'
 
-    # ghost 2
-    if (type(ghost_dists_test[2]) == int):
-        ghost2_dist = ghost_dists_test[2]
-        ghost2_posi = (gameState.getGhostPositions()[2][0], gameState.getGhostPositions()[2][1])
-        ghost2_dire = getBestDirection(pacman_pos, ghost2_posi)
-    else:
-        ghost2_dist = -1
-        ghost2_dire = 'NULL'
+            ghost_data.append(ghostX_data[0])
+            ghost_data.append(ghostX_data[1])
 
-    # ghost 3
-    if (type(ghost_dists_test[3]) == int):
-        ghost3_dist = ghost_dists_test[3]
-        ghost3_posi = (gameState.getGhostPositions()[3][0], gameState.getGhostPositions()[3][1])
-        ghost3_dire = getBestDirection(pacman_pos, ghost3_posi)
-    else:
-        ghost3_dist = -1
-        ghost3_dire = 'NULL'
+    # keep consistent with data in csv file (4 ghosts always there)
+    if num_ghosts < 4:
+        for x in range(4-num_ghosts):
+            ghost_data.append(500)
+            ghost_data.append('NULL')
 
-    # readability -> comebine ghost dist & optimal direction to compound lists
-    ghost0_data = [ghost0_dist, ghost0_dire]
-    ghost1_data = [ghost1_dist, ghost1_dire]
-    ghost2_data = [ghost2_dist, ghost2_dire]
-    ghost3_data = [ghost3_dist, ghost3_dire]
-    ghost_data = ghost0_data + ghost1_data + ghost2_data + ghost3_data
+
+    ## readability -> comebine ghost dist & optimal direction to compound lists
+    #ghost0_data = [ghost0_dist, ghost0_dire]
+    #ghost1_data = [ghost1_dist, ghost1_dire]
+    #ghost2_data = [ghost2_dist, ghost2_dire]
+    #ghost3_data = [ghost3_dist, ghost3_dire]
+    #ghost_data = ghost0_data + ghost1_data + ghost2_data + ghost3_data
+
 
     # wall test / legal moves
     ORDER = ['North', 'South', 'East', 'West', 'Stop']
@@ -596,17 +545,32 @@ def globalPrintLineData(gameState, *, useOld=False):
 
 
 # Determines the simplistic optimal cardinal direction to head in to reach a ghost
-def getBestDirection(pacman_pos: tuple, ghost_posi: tuple) -> str:
+def getBestDirection(pacman_pos: tuple, ghost_posi: tuple, mod: int) -> str:
     x_diff = ghost_posi[0] - pacman_pos[0]
     y_diff = ghost_posi[1] - pacman_pos[1]
 
-    if (abs(x_diff) > abs(y_diff)):
-        if x_diff >= 0:
-            return "East"
+    if mod%2 == 0:
+        if (abs(x_diff) > abs(y_diff)):
+            if x_diff >= 0:
+                return "East"
+            else:
+                return "West"
         else:
-            return "West"
-    else:
-        if y_diff >= 0:
-            return "North"
+            if y_diff >= 0:
+                return "North"
+            else:
+                return "South"
+    elif mod%2 == 1:
+        if (abs(x_diff) > abs(y_diff)):
+            if x_diff <= 0:
+                return "West"
+            else:
+                return "East"
         else:
-            return "South"
+            if y_diff <= 0:
+                return "South"
+            else:
+                return "North"
+
+    # should never occur..
+    return 'NULL'

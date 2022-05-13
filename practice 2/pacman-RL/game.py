@@ -709,7 +709,7 @@ class Game(object):
 
             # For Q-learning: update Q-table
             if agentIndex == 0:
-               agent.update(observation, action, self.state, agent.getReward(observation, action, self.state))
+                agent.update(observation, action, self.state, agent.getReward(observation, action, self.state))
                 
                 
             # Change the display

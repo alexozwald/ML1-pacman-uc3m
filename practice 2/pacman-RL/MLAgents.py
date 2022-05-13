@@ -39,7 +39,7 @@ class QLearningAgent(BustersAgent):
         self.distancer = Distancer(gameState.data.layout, False)
 
 
-        self.epsilon = 0.125
+        self.epsilon = 0.1
         self.alpha = 0.9
         self.discount = 0.8
         
@@ -288,14 +288,10 @@ class QLearningAgent(BustersAgent):
         else:
             r -= 0.9
 
-        print(f"reward: {r}  &&  dir={action}, optimal={optimal_dir}")
+        print(f"reward: {r}\tdir={action}, optimal={optimal_dir}")
         return r
 
         # -update state: moved farther from closest ghost. (by 1 or by 2 is even worse)
-
-
-
-        util.raiseNotDefined()
 
 
     #######################

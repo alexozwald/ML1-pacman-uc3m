@@ -1,65 +1,20 @@
-future_score,current_score,food,capsules,ghost0_dist,ghost0_dire,ghost1_dist,ghost1_dire,ghost2_dist,ghost2_dire,ghost3_dist,ghost3_dire,prev_action
-0,0,0,0,13,South,25,South,28,East,35,East,Stop
--1,0,0,0,13,South,23,South,28,East,33,East,South
--2,-1,0,0,12,South,23,South,28,East,33,East,South
--3,-2,0,0,10,South,22,South,26,East,32,East,South
--4,-3,0,0,10,South,20,South,26,East,31,East,South
--5,-4,0,0,8,South,18,South,26,East,29,East,South
--6,-5,0,0,6,East,17,East,24,East,27,East,South
--7,-6,0,0,4,East,15,East,24,East,25,East,South
--8,-7,0,0,4,East,13,East,22,East,23,East,South
--9,-8,0,0,3,East,11,East,21,East,23,East,South
--10,-9,0,0,5,East,9,East,19,East,23,East,South
--11,-10,0,0,7,East,9,East,19,East,23,East,South
--12,-11,0,0,9,East,9,East,19,East,23,East,South
--13,-12,0,0,7,East,7,East,17,East,21,East,East
--14,-13,0,0,5,East,5,East,17,East,19,East,East
--15,-14,0,0,5,East,7,East,19,East,19,East,North
--16,-15,0,0,3,East,5,East,19,East,19,East,East
--17,-16,0,0,2,North,5,East,17,East,19,East,East
--18,-17,0,0,2,South,5,East,19,East,19,East,North
--19,-18,0,0,2,South,4,South,19,East,18,East,East
--20,-19,0,0,2,West,2,South,19,East,18,East,South
--21,-20,0,0,2,South,4,East,21,East,20,East,West
--22,-21,0,0,1,South,6,East,22,East,20,East,West
-177,-22,0,0,None,None,5,East,20,East,20,East,South
-176,177,0,0,None,None,5,East,20,East,18,East,East
-175,176,0,0,None,None,5,East,18,East,18,East,East
-174,175,0,0,None,None,3,East,16,East,17,East,East
-173,174,0,0,None,None,1,South,15,East,17,East,East
-372,173,0,0,None,None,None,None,16,East,17,East,South
-371,372,0,0,None,None,None,None,14,East,15,East,East
-370,371,0,0,None,None,None,None,12,East,14,East,East
-369,370,0,0,None,None,None,None,11,East,14,East,East
-368,369,0,0,None,None,None,None,11,East,14,East,North
-367,368,0,0,None,None,None,None,11,East,14,East,North
-366,367,0,0,None,None,None,None,12,East,14,East,North
-365,366,0,0,None,None,None,None,14,East,16,East,North
-364,365,0,0,None,None,None,None,15,East,18,East,North
-363,364,0,0,None,None,None,None,17,East,18,East,North
-362,363,0,0,None,None,None,None,19,East,20,East,North
-361,362,0,0,None,None,None,None,17,East,18,East,East
-360,361,0,0,None,None,None,None,15,East,16,East,East
-359,360,0,0,None,None,None,None,15,East,14,East,South
-358,359,0,0,None,None,None,None,13,East,12,South,East
-357,358,0,0,None,None,None,None,13,East,11,East,South
-356,357,0,0,None,None,None,None,13,East,9,East,South
-355,356,0,0,None,None,None,None,13,East,8,East,South
-354,355,0,0,None,None,None,None,11,East,6,East,South
-353,354,0,0,None,None,None,None,11,East,6,East,South
-352,353,0,0,None,None,None,None,11,East,6,East,East
-351,352,0,0,None,None,None,None,10,East,5,East,East
-350,351,0,0,None,None,None,None,10,East,3,South,East
-349,350,0,0,None,None,None,None,8,East,1,South,East
-548,349,0,0,None,None,None,None,7,East,None,None,East
-547,548,0,0,None,None,None,None,7,East,None,None,East
-546,547,0,0,None,None,None,None,7,East,None,None,East
-545,546,0,0,None,None,None,None,6,East,None,None,East
-544,545,0,0,None,None,None,None,6,South,None,None,East
-543,544,0,0,None,None,None,None,5,East,None,None,South
-542,543,0,0,None,None,None,None,3,East,None,None,South
-541,542,0,0,None,None,None,None,3,East,None,None,South
-540,541,0,0,None,None,None,None,1,East,None,None,East
+@relation training_tutorial1_yay
+
+@attribute future_score numeric
+@attribute current_score numeric
+@attribute food numeric
+@attribute capsules numeric
+@attribute ghost0_dist numeric
+@attribute ghost0_dire {NULL,West,East,North,South}
+@attribute ghost1_dist numeric
+@attribute ghost1_dire {NULL,West,East,North,South}
+@attribute ghost2_dist numeric
+@attribute ghost2_dire {NULL,West,East,North,South}
+@attribute ghost3_dist numeric
+@attribute ghost3_dire {NULL,West,East,North,South}
+@attribute prev_action {Stop,West,East,North,South}
+
+@data
 0,0,0,0,13,South,25,South,28,East,35,East,Stop
 -1,0,0,0,13,South,24,South,28,East,33,East,South
 -2,-1,0,0,11,South,22,South,28,East,33,East,South
@@ -594,39 +549,3 @@ future_score,current_score,food,capsules,ghost0_dist,ghost0_dire,ghost1_dist,gho
 526,527,0,0,500,NULL,500,NULL,500,NULL,3,South,East
 525,526,0,0,500,NULL,500,NULL,500,NULL,2,South,South
 524,525,0,0,500,NULL,500,NULL,500,NULL,1,South,East
-future_score,current_score,food,capsules,ghost0_dist,ghost0_dire,ghost1_dist,ghost1_dire,ghost2_dist,ghost2_dire,ghost3_dist,ghost3_dire,prev_action
-0,0,1,0,11,West,9,West,5,South,3,North,Stop
-future_score,current_score,food,capsules,ghost0_dist,ghost0_dire,ghost1_dist,ghost1_dire,ghost2_dist,ghost2_dire,ghost3_dist,ghost3_dire,prev_action
-0,0,1,0,11,West,9,West,5,South,3,North,Stop
-future_score,current_score,food,capsules,ghost0_dist,ghost0_dire,ghost1_dist,ghost1_dire,ghost2_dist,ghost2_dire,ghost3_dist,ghost3_dire,prev_action
-0,0,1,0,11,West,9,West,5,South,3,North,Stop
-future_score,current_score,food,capsules,ghost0_dist,ghost0_dire,ghost1_dist,ghost1_dire,ghost2_dist,ghost2_dire,ghost3_dist,ghost3_dire,prev_action
-1,2,,,1,2,,,W,e,s,t
-1,2,,,1,2,,,W,e,s,t
-1,2,,,1,2,,,W,e,s,t
-1,2,,,1,2,,,W,e,s,t
-1,2,,,1,2,,,W,e,s,t
-1,2,,,1,2,,,W,e,s,t
-1,2,,,1,2,,,W,e,s,t
-1,2,,,1,2,,,W,e,s,t
-1,2,,,1,2,,,W,e,s,t
-1,2,,,1,2,,,W,e,s,t
-1,2,,,1,2,,,W,e,s,t
-1,2,,,1,2,,,W,e,s,t
-1,2,,,1,2,,,W,e,s,t
-1,2,,,1,2,,,W,e,s,t
-1,2,,,1,2,,,W,e,s,t
-1,2,,,1,2,,,W,e,s,t
-1,2,,,1,2,,,W,e,s,t
-future_score,current_score,food,capsules,ghost0_dist,ghost0_dire,ghost1_dist,ghost1_dire,ghost2_dist,ghost2_dire,ghost3_dist,ghost3_dire,prev_action
-0,0,1,0,11,West,9,West,5,South,3,North,Stop
-future_score,current_score,food,capsules,ghost0_dist,ghost0_dire,ghost1_dist,ghost1_dire,ghost2_dist,ghost2_dire,ghost3_dist,ghost3_dire,prev_action
-0,0,1,0,11,West,9,West,5,South,3,North,Stop
-future_score,current_score,food,capsules,ghost0_dist,ghost0_dire,ghost1_dist,ghost1_dire,ghost2_dist,ghost2_dire,ghost3_dist,ghost3_dire,prev_action
-0,0,1,0,11,West,9,West,5,South,3,North,Stop
-future_score,current_score,food,capsules,ghost0_dist,ghost0_dire,ghost1_dist,ghost1_dire,ghost2_dist,ghost2_dire,ghost3_dist,ghost3_dire,prev_action
-0,0,1,0,11,West,9,West,5,South,3,North,Stop
-future_score,current_score,food,capsules,ghost0_dist,ghost0_dire,ghost1_dist,ghost1_dire,ghost2_dist,ghost2_dire,ghost3_dist,ghost3_dire,prev_action
-0,0,1,0,11,West,9,West,5,South,3,North,Stop
-future_score,current_score,food,capsules,ghost0_dist,ghost0_dire,ghost1_dist,ghost1_dire,ghost2_dist,ghost2_dire,ghost3_dist,ghost3_dire,prev_action
-0,0,1,0,11,West,9,West,5,South,3,North,Stop
